@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مكتبتي - Steam Tools</title>
+<link rel="icon" type="image/png" href="storecon.png">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="firebase.js"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#121212;--surface:#1a1a1a;--surface2:#242424;--surface3:#2a2a2a;
+  --accent:#ac4d00;--accent-h:#181818e5;
+  --text:#ffffff;--text2:#8f8f8f;--text3:#4a4a4a;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.04);
+  --success:#00e676;--error:#ff4757;--gold:#f5c518;
+}
+body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 48px;height:56px;
+  background:rgba(14,15,17,0.95);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;letter-spacing:2px;display:flex;align-items:center;gap:10px;}
+.nav-logo::before{content:'';width:28px;height:28px;background:var(--accent);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:block;}
+.nav-links{display:flex;align-items:center;gap:8px;}
+.nav-links a{padding:8px 16px;border-radius:6px;font-size:14px;font-weight:600;color:var(--text2);transition:.2s;}
+.nav-links a:hover{color:var(--text);background:rgba(255,255,255,0.06);}
+.nav-links a.active{color:var(--text);}
+.nav-cta{background:var(--accent);color:#fff!important;padding:9px 22px;border-radius:6px;font-size:14px;font-weight:700;}
+.nav-cta:hover{background:#ff6600!important;}
+
+/* HEADER */
+.lib-header{
+  margin-top:56px;
+  background:linear-gradient(to bottom,var(--surface) 0%,var(--bg) 100%);
+  border-bottom:1px solid var(--border);
+  padding:48px 48px 32px;
+}
+
+.lib-title{
+  font-family:'Rajdhani',sans-serif;
+  font-size:40px;font-weight:700;letter-spacing:-1px;
+  display:flex;align-items:center;gap:14px;margin-bottom:8px;
+}
+.lib-title::before{content:'';width:4px;height:38px;background:linear-gradient(var(--accent),var(--accent2));border-radius:2px;}
+.lib-sub{font-size:15px;color:var(--text2);padding-right:18px;}
+
+.lib-stats{
+  display:flex;gap:24px;margin-top:28px;padding-right:18px;
+}
+.lib-stat{
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface2);border:1px solid var(--border);
+  padding:10px 18px;border-radius:8px;
+}
+.lib-stat-num{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--accent2);}
+.lib-stat-label{font-size:13px;color:var(--text2);font-weight:600;}
+
+/* CONTENT */
+.lib-content{padding:40px 48px;}
+
+.search-bar{
+  display:flex;align-items:center;gap:12px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:12px 18px;
+  margin-bottom:32px;
+}
+.search-bar svg{opacity:.4;flex-shrink:0;}
+.search-bar input{
+  background:none;border:none;color:var(--text);
+  font-size:15px;font-family:'Cairo',sans-serif;
+  outline:none;flex:1;
+}
+.search-bar input::placeholder{color:var(--text3);}
+
+/* GAMES GRID */
+#library-container{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:20px;
+}
+
+.lib-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;
+  transition:.3s;position:relative;
+}
+.lib-card:hover{
+  border-color:rgba(228, 91, 0, 0.35);
+  box-shadow:0 12px 40px rgba(0,0,0,0.5);
+  transform:translateY(-4px);
+}
+
+.lib-card-img{
+  width:100%;height:160px;object-fit:cover;
+  display:block;transition:.3s;background:#111;
+}
+.lib-card:hover .lib-card-img{transform:scale(1.04);}
+
+.lib-card-img-wrap{overflow:hidden;position:relative;}
+
+.owned-badge{
+  position:absolute;top:10px;right:10px;
+  background:rgba(0,230,118,0.15);border:1px solid rgba(0,230,118,0.35);
+  color:var(--success);padding:4px 10px;border-radius:4px;
+  font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  display:flex;align-items:center;gap:5px;
+}
+.owned-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--success);}
+
+.lib-card-body{padding:16px;}
+.lib-card-name{font-size:17px;font-weight:700;margin-bottom:8px;}
+.lib-card-meta{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:12px;color:var(--text2);margin-bottom:14px;
+}
+
+.download-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:11px;border-radius:7px;
+  background:rgba(228, 110, 0, 0.12);border:1px solid rgba(228, 65, 0, 0.3);
+  color:var(--accent2);font-size:14px;font-weight:700;
+  font-family:'Cairo',sans-serif;cursor:pointer;
+  transition:.2s;letter-spacing:.3px;
+}
+.download-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+/* EMPTY STATE */
+.empty{
+  text-align:center;padding:100px 20px;color:var(--text3);
+  grid-column:1/-1;
+}
+.empty-icon{
+  width:80px;height:80px;border-radius:50%;
+  background:var(--surface2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;
+}
+.empty h3{font-size:20px;font-weight:700;color:var(--text2);margin-bottom:8px;}
+.empty p{font-size:14px;margin-bottom:24px;}
+.browse-btn{
+  background:var(--accent);color:#fff;border:none;
+  padding:12px 28px;border-radius:8px;font-size:14px;font-weight:700;
+  font-family:'Cairo',sans-serif;cursor:pointer;transition:.2s;
+}
+.browse-btn:hover{background:#0088ff;}
+
+footer{background:var(--surface);border-top:1px solid var(--border);padding:28px 48px;display:flex;align-items:center;justify-content:space-between;margin-top:60px;}
+.footer-logo{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px;color:var(--text2);}
+.footer-copy{font-size:13px;color:var(--text3);}
+
+@media(max-width:768px){
+  nav{padding:0 20px;}
+  .lib-header{padding:32px 20px 24px;}
+  .lib-content{padding:24px 20px;}
+  .lib-stats{flex-wrap:wrap;gap:12px;}
+  footer{flex-direction:column;gap:12px;text-align:center;padding:20px;}
+}
+
+/* ── TOPBAR Epic ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  height:56px;background:#1a1a1a;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 20px;
+  transition:box-shadow .2s;
+}
+.topbar-logo{
+  display:flex;align-items:center;gap:10px;
+  padding-left:20px;margin-left:16px;
+  border-left:1px solid var(--border);height:56px;
+}
+.logo-icon{
+  width:32px;height:32px;background:var(--accent);
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  flex-shrink:0;
+}
+.logo-text{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:1.5px;}
+.topbar-nav{display:flex;align-items:center;gap:2px;flex:1;margin-right:8px;}
+.topbar-nav a{
+  height:56px;display:flex;align-items:center;gap:7px;
+  padding:0 14px;font-size:13px;font-weight:600;color:var(--text2);
+  border-bottom:2px solid transparent;transition:.15s;text-decoration:none;color:var(--text2);
+}
+.topbar-nav a:hover{color:var(--text);}
+.topbar-nav a.active{color:var(--text);border-bottom-color:var(--accent);}
+.topbar-right{margin-right:auto;}
+.btn-account{
+  background:var(--accent);color:#fff !important;
+  padding:7px 18px;border-radius:4px;
+  font-size:13px;font-weight:700;font-family:'Cairo',sans-serif;
+  transition:.15s;text-decoration:none;
+}
+.btn-account:hover{background:var(--accent-h) !important;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<header class="topbar" id="topbar">
+  <div class="topbar-logo">
+    <div class="logo-icon"></div>
+    <span class="logo-text">Steam Tools</span>
+  </div>
+  <nav class="topbar-nav">
+    <a href="index.html">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+      المتجر
+    </a>
+    <a href="library.html" class="active">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+      مكتبتي
+    </a>
+  </nav>
+  <div class="topbar-right">
+    <a href="auth.html" id="accountLink" class="btn-account">حسابي</a>
+  </div>
+</header>
+
+<div class="lib-header">
+  <div class="lib-title">مكتبتي</div>
+  <div class="lib-sub">العاب المشتراة برنامجة للتحميل</div>
+  <div class="lib-stats">
+    <div class="lib-stat">
+      <span class="lib-stat-num" id="gamesCount">0</span>
+      <span class="lib-stat-label">املاكك</span>
+    </div>
+  </div>
+</div>
+
+<div class="lib-content">
+  <div class="search-bar">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    <input type="text" placeholder="ابحث في مكتبتك..." id="searchInput" oninput="filterLib()">
+  </div>
+  <div id="library-container"></div>
+</div>
+
+<footer>
+  <div class="footer-logo">Steam Tools</div>
+  <div class="footer-copy">&copy; 2026 Steam Tools</div>
+</footer>
+
+<script>
+const uid = localStorage.getItem("uid");
+if(!uid){ alert("يجب تسجيل الدخول"); location="auth.html"; }
+
+let allCards = [];
+
+db.ref("usersperfect/"+uid+"/gamesOwned").once("value").then(snapshot=>{
+  const container = document.getElementById("library-container");
+
+  if(!snapshot.exists()){
+    container.innerHTML=`<div class="empty">
+      <div class="empty-icon"><svg width="32" height="32" fill="none" stroke="#5a5e72" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div>
+      <h3>مكتبتك فارغة</h3>
+      <p>لم تشترِ أي ملف بعد. اكتشف العابنا الرائعة!</p>
+      <button class="browse-btn" onclick="location.href='index.html'">تصفح العاب</button>
+    </div>`;
+    return;
+  }
+
+  let count = 0;
+  snapshot.forEach(gSnap=>{
+    const gameId = gSnap.key;
+    const data = gSnap.val();
+    db.ref("games/"+gameId).once("value").then(s=>{
+      const game = s.val();
+      if(!game) return;
+      count++;
+      document.getElementById("gamesCount").textContent = count;
+
+      const date = new Date(data.purchasedAt).toLocaleDateString("ar-SA");
+
+      const card = document.createElement("div");
+      card.className = "lib-card";
+      card.dataset.name = (game.name||"").toLowerCase();
+
+      card.innerHTML=`
+        <div class="lib-card-img-wrap">
+          <img class="lib-card-img" src="${game.coverImage||game.image||''}" alt="${game.name}" loading="lazy">
+          <span class="owned-badge">مملوكة</span>
+        </div>
+        <div class="lib-card-body">
+          <div class="lib-card-name">${game.name}</div>
+          <div class="lib-card-meta">
+            <span>تاريخ الشراء: ${date}</span>
+            <span>${game.size||""}</span>
+          </div>
+          <button class="download-btn" data-file="${game.fileName||""}">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            تحميل الملف
+          </button>
+        </div>
+      `;
+
+      card.querySelector(".download-btn").addEventListener("click",()=>{
+        const f = game.fileName;
+        if(!f){ alert("ملف ملف غير موجود"); return; }
+        window.location.href = "Games/"+f;
+      });
+
+      container.appendChild(card);
+      allCards.push(card);
+    });
+  });
+});
+
+function filterLib(){
+  const q = document.getElementById("searchInput").value.toLowerCase();
+  allCards.forEach(c=>{
+    c.style.display = c.dataset.name.includes(q) ? "" : "none";
+  });
+}
+</script>
+<script>
+window.addEventListener('scroll',()=>{
+  const t=document.getElementById('topbar');
+  if(t) t.style.boxShadow=scrollY>8?'0 2px 24px rgba(0,0,0,0.6)':'none';
+});
+const _uid=localStorage.getItem('uid');
+const _al=document.getElementById('accountLink');
+if(_al&&_uid){_al.href='profile.html';}
+</script>
+</body>
+</html>

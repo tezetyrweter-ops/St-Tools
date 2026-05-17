@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Steam Tools</title>
+<link rel="icon" type="image/png" href="storecon.png">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="firebase.js"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#121212;--surface:#1a1a1a;--surface2:#242424;--surface3:#2a2a2a;
+  --accent:#ac4d00;--accent-h:#181818e5;
+  --text:#ffffff;--text2:#8f8f8f;--text3:#4a4a4a;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.04);
+  --sidebar:252px;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;min-height:100vh;overflow-x:hidden;}
+a{text-decoration:none;color:inherit;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px;}
+
+/* TOPBAR */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  height:56px;background:#1a1a1a;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 20px;
+  transition:box-shadow .2s;
+}
+.topbar-logo{
+  display:flex;align-items:center;gap:10px;
+  padding-left:20px;margin-left:16px;
+  border-left:1px solid var(--border);height:56px;
+}
+.logo-icon{
+  width:32px;height:32px;background:var(--accent);
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+}
+.logo-text{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:1.5px;}
+.topbar-nav{display:flex;align-items:center;gap:2px;flex:1;margin-right:12px;}
+.topbar-nav a{
+  height:56px;display:flex;align-items:center;gap:7px;
+  padding:0 14px;font-size:13px;font-weight:600;color:var(--text2);
+  border-bottom:2px solid transparent;transition:.15s;
+}
+.topbar-nav a:hover{color:var(--text);}
+.topbar-nav a.active{color:var(--text);border-bottom-color:var(--accent);}
+.topbar-right{margin-right:auto;}
+.btn-account{
+  background:var(--accent);color:#fff;
+  padding:7px 18px;border-radius:4px;
+  font-size:13px;font-weight:700;font-family:'Cairo',sans-serif;transition:.15s;
+}
+.btn-account:hover{background:var(--accent-h);}
+
+/* LAYOUT */
+.layout{display:flex;margin-top:56px;min-height:calc(100vh - 56px);}
+
+/* SIDEBAR */
+.sidebar{
+  width:var(--sidebar);flex-shrink:0;
+  background:var(--surface);border-left:1px solid var(--border);
+  position:sticky;top:56px;height:calc(100vh - 56px);
+  overflow-y:auto;padding:20px 0;
+}
+.sb-section{padding:0 0 18px;border-bottom:1px solid var(--border2);margin-bottom:18px;}
+.sb-section:last-child{border-bottom:none;margin:0;}
+.sb-label{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--text3);text-transform:uppercase;padding:0 18px;margin-bottom:6px;display:block;}
+.sb-item{
+  display:flex;align-items:center;gap:11px;
+  padding:9px 18px;font-size:13px;font-weight:600;color:var(--text2);
+  cursor:pointer;transition:.15s;border-right:3px solid transparent;
+}
+.sb-item:hover{color:var(--text);background:rgba(255,255,255,0.04);}
+.sb-item.active{color:var(--text);background:rgba(255,255,255,0.06);border-right-color:var(--accent);}
+.sb-item svg{opacity:.7;flex-shrink:0;}
+.sb-item.active svg{opacity:1;}
+
+/* MAIN */
+.main{flex:1;min-width:0;}
+
+/* FEATURED */
+.featured{
+  height:400px;position:relative;overflow:hidden;
+  background:linear-gradient(130deg,#0a0a14 0%,#0b1428 55%,#0a0f1e 100%);
+}
+.feat-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 65% 90% at 65% 55%,rgba(0,120,242,0.13) 0%,transparent 65%),
+    radial-gradient(ellipse 35% 55% at 15% 90%,rgba(0,60,160,0.09) 0%,transparent 55%);
+}
+.feat-content{
+  position:relative;z-index:2;
+  display:flex;align-items:flex-end;height:100%;
+  padding:36px 44px;
+}
+.feat-info{max-width:480px;}
+.feat-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--accent);padding:3px 10px;border-radius:2px;
+  font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  margin-bottom:14px;
+}
+.feat-title{
+  font-family:'Rajdhani',sans-serif;font-size:54px;font-weight:700;
+  line-height:.92;letter-spacing:-1.5px;margin-bottom:12px;
+}
+.feat-desc{font-size:14px;color:var(--text2);line-height:1.65;margin-bottom:24px;max-width:380px;}
+.feat-btns{display:flex;gap:8px;}
+.btn-primary{
+  background:var(--accent);color:#fff;padding:10px 26px;border-radius:4px;
+  font-size:13px;font-weight:700;font-family:'Cairo',sans-serif;
+  transition:.15s;border:none;cursor:pointer;
+}
+.btn-primary:hover{background:var(--accent-h);}
+.btn-ghost{
+  background:rgba(255,255,255,0.1);color:var(--text);
+  border:1px solid rgba(255,255,255,0.14);
+  padding:10px 22px;border-radius:4px;
+  font-size:13px;font-weight:600;font-family:'Cairo',sans-serif;
+  transition:.15s;cursor:pointer;
+}
+.btn-ghost:hover{background:rgba(255,255,255,0.17);}
+
+/* STATS */
+.stats-row{display:flex;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.stat{flex:1;padding:20px 36px;border-left:1px solid var(--border);text-align:center;}
+.stat:last-child{border-left:none;}
+.stat-num{font-family:'Rajdhani',sans-serif;font-size:30px;font-weight:700;display:block;margin-bottom:2px;}
+.stat-label{font-size:11px;color:var(--text2);font-weight:600;letter-spacing:.3px;}
+
+/* SECTION */
+.section{padding:28px 36px;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.section-title{font-family:'Rajdhani',sans-serif;font-size:21px;font-weight:700;}
+.section-more{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.5px;display:flex;align-items:center;gap:4px;text-transform:uppercase;transition:.15s;}
+.section-more:hover{color:var(--text);}
+
+/* FILTERS */
+.filters{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+.filter-btn{
+  background:var(--surface2);border:1px solid var(--border);color:var(--text2);
+  padding:6px 16px;border-radius:4px;font-size:12px;font-weight:700;
+  font-family:'Cairo',sans-serif;cursor:pointer;transition:.15s;letter-spacing:.3px;
+}
+.filter-btn:hover{background:var(--surface3);color:var(--text);}
+.filter-btn.active{background:var(--text);color:#111;border-color:var(--text);}
+
+/* GRID */
+#games{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;}
+.card{
+  background:var(--surface);border-radius:5px;overflow:hidden;
+  cursor:pointer;transition:.2s;border:1px solid var(--border2);
+}
+.card:hover{transform:translateY(-5px);border-color:rgba(255,255,255,0.13);box-shadow:0 18px 44px rgba(0,0,0,0.6);}
+.card-img-wrap{overflow:hidden;position:relative;}
+.card-img{width:100%;height:145px;object-fit:cover;display:block;transition:.3s;background:#111;}
+.card:hover .card-img{transform:scale(1.07);}
+.card-badge{
+  position:absolute;top:7px;right:7px;padding:2px 7px;border-radius:3px;
+  font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+}
+.card-badge.steam{background:rgba(20,30,45,0.9);color:#66c0f4;}
+.card-badge.torrent{background:rgba(0,0,0,0.75);color:#00e676;}
+.card-body{padding:11px 13px 13px;}
+.card-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;}
+.card-desc{font-size:11px;color:var(--text2);line-height:1.5;height:32px;overflow:hidden;margin-bottom:11px;}
+.add-btn{
+  background:var(--accent);color:#fff;border:none;width:100%;
+  padding:8px;border-radius:3px;font-size:12px;font-weight:700;
+  font-family:'Cairo',sans-serif;cursor:pointer;transition:.15s;
+}
+.add-btn:hover{background:var(--accent-h);}
+
+/* EMPTY */
+.empty{text-align:center;padding:70px 20px;color:var(--text3);grid-column:1/-1;}
+.empty p{font-size:13px;margin-top:10px;}
+
+/* FOOTER */
+footer{background:var(--surface);border-top:1px solid var(--border);padding:22px 36px;display:flex;align-items:center;justify-content:space-between;}
+.footer-logo{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;color:var(--text2);}
+.footer-copy{font-size:11px;color:var(--text3);}
+
+/* SKELETON */
+.skeleton{background:linear-gradient(90deg,var(--surface) 25%,var(--surface2) 50%,var(--surface) 75%);background-size:200%;animation:shimmer 1.4s infinite;border-radius:5px;}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .feat-content{padding:24px 20px;}
+  .feat-title{font-size:38px;}
+  .section{padding:22px 18px;}
+  .stats-row{flex-wrap:wrap;}
+  .stat{border-left:none;border-bottom:1px solid var(--border);}
+  footer{flex-direction:column;gap:8px;text-align:center;padding:18px;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar" id="topbar">
+  <div class="topbar-logo">
+    <div class="logo-icon"></div>
+    <span class="logo-text">Steam Tools</span>
+  </div>
+  <nav class="topbar-nav">
+    <a href="index.html" class="active">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+      الرئيسية
+    </a>
+    <a href="library.html">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+      مكتبتي
+    </a>
+  </nav>
+  <div class="topbar-right">
+    <a href="auth.html" id="accountLink" class="btn-account">حسابي</a>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="sb-section">
+      <span class="sb-label">التصفح</span>
+      <div class="sb-item active" onclick="filterSidebar('all',this)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        كل العاب
+      </div>
+      <div class="sb-item" onclick="filterSidebar('steam',this)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>
+        تطبيقات
+      </div>
+      <div class="sb-item" onclick="filterSidebar('torrent',this)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        العاب
+      </div>
+    </div>
+    <div class="sb-section">
+      <span class="sb-label">الحساب</span>
+      <div class="sb-item" onclick="location.href='profile.html'">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        الملف الشخصي
+      </div>
+      <div class="sb-item" onclick="location.href='library.html'">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        مكتبة العاب
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="featured">
+      <div class="feat-bg"></div>
+      <div class="feat-content">
+        <div class="feat-info">
+          <div class="feat-tag">Steam Tools</div>
+          <div class="feat-title">اكتشف<br>أفضل العاب</div>
+          <div class="feat-desc">تطبيقات والعاب حصرية — أضف مباشرة لمكتبتك وابدأ الاستخدام فوراً.</div>
+          <div class="feat-btns">
+            <button class="btn-primary" onclick="document.getElementById('games-section').scrollIntoView({behavior:'smooth'})">تصفح العاب</button>
+            <button class="btn-ghost" onclick="location.href='library.html'">مكتبتي</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat"><span class="stat-num" id="s1">—</span><span class="stat-label">لعبة متاحة</span></div>
+      <div class="stat"><span class="stat-num">مجاني</span><span class="stat-label">الانضمام مجاني</span></div>
+      <div class="stat"><span class="stat-num">24/7</span><span class="stat-label">دعم مستمر</span></div>
+    </div>
+
+    <section class="section" id="games-section">
+      <div class="section-header">
+        <h2 class="section-title">المتاح</h2>
+        <a class="section-more">عرض الكل <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      </div>
+      <div class="filters">
+        <button class="filter-btn active" onclick="filterGames('all',this)">الكل</button>
+        <button class="filter-btn" onclick="filterGames('steam',this)">تطبيقات</button>
+        <button class="filter-btn" onclick="filterGames('torrent',this)">العاب</button>
+      </div>
+      <div id="games"></div>
+    </section>
+
+    <footer>
+      <div class="footer-logo">Steam Tools</div>
+      <div class="footer-copy">&copy; 2026 Steam Tools — كل الحقوق محفوظة</div>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+const uid = localStorage.getItem("uid");
+const accountLink = document.getElementById("accountLink");
+if(uid){ accountLink.href="profile.html"; accountLink.textContent="حسابي"; }
+
+const gamesContainer = document.getElementById("games");
+let allGames = [];
+let currentCategory = "all";
+
+db.ref("games").once("value").then(snap=>{
+  snap.forEach(gSnap=>{ allGames.push({id:gSnap.key,...gSnap.val()}); });
+  document.getElementById("s1").textContent = allGames.length;
+  displayGames("all");
+});
+
+function displayGames(category){
+  currentCategory = category;
+  gamesContainer.innerHTML="";
+  const filtered = category==="all" ? allGames : allGames.filter(g=>g.category===category);
+
+  if(filtered.length===0){
+    gamesContainer.innerHTML=`<div class="empty">
+      <svg width="36" height="36" fill="none" stroke="#3a3a3a" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+      <p>لا توجد العاب في هذا القسم</p>
+    </div>`;
+    return;
+  }
+
+  filtered.forEach(game=>{
+    const card=document.createElement("div");
+    card.className="card";
+    const bc = game.category==="steam"?"steam":"torrent";
+    const bt = game.category==="steam"?"برنامج":"لعبة";
+    card.innerHTML=`
+      <div class="card-img-wrap">
+        <img class="card-img" src="${game.coverImage||''}" alt="${game.name}" loading="lazy">
+        <span class="card-badge ${bc}">${bt}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-name">${game.name}</div>
+        <div class="card-desc">${game.description?game.description.substring(0,70)+"...":""}</div>
+        <button class="add-btn" onclick="goGame('${game.id}')">إضافة للمكتبة</button>
+      </div>
+    `;
+    gamesContainer.appendChild(card);
+  });
+}
+
+function filterGames(category, btn){
+  document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  syncSidebar(category);
+  displayGames(category);
+}
+
+function filterSidebar(category, el){
+  document.querySelectorAll(".sb-item").forEach(i=>i.classList.remove("active"));
+  el.classList.add("active");
+  document.querySelectorAll(".filter-btn").forEach((b,i)=>{
+    if(i===0&&category==="all"||i===1&&category==="steam"||i===2&&category==="torrent")
+      b.classList.add("active");
+    else b.classList.remove("active");
+  });
+  displayGames(category);
+}
+
+function syncSidebar(category){
+  document.querySelectorAll(".sb-item").forEach((item,i)=>{
+    const match=(i===0&&category==="all")||(i===1&&category==="steam")||(i===2&&category==="torrent");
+    if(match) item.classList.add("active"); else item.classList.remove("active");
+  });
+}
+
+function goGame(id){
+  localStorage.setItem("buyGame",id);
+  window.location.href="game.html?id="+id;
+}
+
+window.addEventListener("scroll",()=>{
+  document.getElementById("topbar").style.boxShadow =
+    scrollY>8?"0 2px 24px rgba(0,0,0,0.6)":"none";
+});
+</script>
+</body>
+</html>

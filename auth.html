@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Steam Tools - تسجيل الدخول</title>
+<link rel="icon" type="image/png" href="storecon.png">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="firebase.js"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#121212;--surface:#1a1a1a;--surface2:#242424;--surface3:#2a2a2a;
+  --accent:#ac4d00;--accent-h:#181818e5;
+  --text:#ffffff;--text2:#8f8f8f;--text3:#4a4a4a;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.04);
+  --success:#00e676;--error:#ff4757;--gold:#f5c518;
+}
+
+body{
+  background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;
+  min-height:100vh;display:flex;
+}
+
+/* LEFT PANEL */
+.left-panel{
+  flex:1;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.left-bg{
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,#060a18 0%,#0d1c40 60%,#060a18 100%);
+}
+.left-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(0,116,228,0.06) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,116,228,0.06) 1px,transparent 1px);
+  background-size:50px 50px;
+}
+.left-glow{
+  position:absolute;
+  width:500px;height:500px;
+  background:radial-gradient(circle,rgba(0,116,228,0.2) 0%,transparent 70%);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+}
+.left-content{
+  position:relative;z-index:2;text-align:center;padding:40px;
+}
+.brand{
+  font-family:'Rajdhani',sans-serif;font-size:42px;font-weight:700;
+  letter-spacing:3px;margin-bottom:16px;
+  display:flex;align-items:center;justify-content:center;gap:14px;
+}
+.brand::before{
+  content:'';width:40px;height:40px;
+  background:var(--accent);
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+}
+.tagline{font-size:16px;color:var(--text2);line-height:1.7;max-width:300px;margin:0 auto;}
+.features{margin-top:40px;text-align:right;}
+.feature{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 0;border-bottom:1px solid var(--border);
+}
+.feature:last-child{border-bottom:none;}
+.feature-icon{
+  width:36px;height:36px;border-radius:8px;
+  background:rgba(0,116,228,0.15);border:1px solid rgba(0,116,228,0.25);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.feature-text h4{font-size:14px;font-weight:700;margin-bottom:2px;}
+.feature-text p{font-size:12px;color:var(--text2);}
+
+/* RIGHT PANEL - FORM */
+.right-panel{
+  width:480px;flex-shrink:0;
+  background:var(--surface);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:48px 52px;
+  border-right:1px solid var(--border);
+}
+
+.form-logo{
+  font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;
+  letter-spacing:2px;color:var(--text2);margin-bottom:40px;
+}
+
+.form-tabs{
+  display:flex;gap:0;margin-bottom:32px;width:100%;
+  background:var(--surface2);border-radius:8px;padding:4px;
+}
+.tab-btn{
+  flex:1;padding:10px;border-radius:6px;border:none;
+  background:none;color:var(--text2);font-size:14px;font-weight:700;
+  font-family:'Cairo',sans-serif;cursor:pointer;transition:.2s;letter-spacing:.3px;
+}
+.tab-btn.active{background:var(--accent);color:#fff;}
+
+.form-title{
+  font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;
+  letter-spacing:.5px;margin-bottom:6px;
+}
+.form-sub{font-size:14px;color:var(--text2);margin-bottom:28px;}
+
+.field{margin-bottom:16px;width:100%;}
+.field label{
+  display:block;font-size:12px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--text2);margin-bottom:8px;
+}
+.field input{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);padding:14px 16px;border-radius:8px;
+  font-size:15px;font-family:'Cairo',sans-serif;
+  outline:none;transition:.2s;
+}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,116,228,0.15);}
+.field input::placeholder{color:var(--text3);}
+
+.submit-btn{
+  width:100%;background:var(--accent);color:#fff;border:none;
+  padding:15px;border-radius:8px;font-size:16px;font-weight:700;
+  font-family:'Cairo',sans-serif;cursor:pointer;transition:.25s;
+  letter-spacing:.5px;margin-top:8px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.submit-btn:hover{background:#0088ff;box-shadow:0 8px 24px rgba(0,116,228,0.35);}
+
+.divider{
+  display:flex;align-items:center;gap:12px;
+  margin:20px 0;width:100%;
+}
+.divider::before,.divider::after{
+  content:'';flex:1;height:1px;background:var(--border);
+}
+.divider span{font-size:12px;color:var(--text3);}
+
+.forgot-link{
+  text-align:center;font-size:13px;color:var(--text2);
+  cursor:pointer;transition:.2s;margin-top:16px;width:100%;
+}
+.forgot-link:hover{color:var(--accent2);}
+
+.alert{
+  padding:12px 16px;border-radius:8px;
+  font-size:14px;font-weight:600;margin-bottom:16px;width:100%;
+  display:none;animation:slideIn .3s ease;
+}
+.alert.error{background:rgba(255,71,87,0.12);border:1px solid rgba(255,71,87,0.3);color:var(--error);}
+.alert.success{background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.3);color:var(--success);}
+
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:none;}}
+
+@media(max-width:900px){
+  .left-panel{display:none;}
+  .right-panel{width:100%;border-right:none;padding:32px 24px;}
+}
+</style>
+</head>
+<body>
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+  <div class="left-bg"></div>
+  <div class="left-grid"></div>
+  <div class="left-glow"></div>
+  <div class="left-content">
+    <div class="brand">Steam Tools</div>
+    <p class="tagline">متجرك المفضل للألعاب. اشترِ، حمّل، والعب فوراً.</p>
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="18" height="18" fill="none" stroke="#0074e4" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div class="feature-text">
+          <h4>تطبيقات</h4>
+          <p>تحميل فوري بدون انتظار</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="18" height="18" fill="none" stroke="#0074e4" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="feature-text">
+          <h4>أمان تام</h4>
+          <p>معاملات مشفرة وآمنة</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="18" height="18" fill="none" stroke="#0074e4" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+        </div>
+        <div class="feature-text">
+          <h4>رصيد مجاني</h4>
+          <p>0$ هدية عند إنشاء الحساب</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+  <div class="form-logo">Steam Tools</div>
+
+  <div class="form-tabs">
+    <button class="tab-btn active" onclick="setMode('login',this)">تسجيل دخول</button>
+    <button class="tab-btn" onclick="setMode('register',this)">حساب جديد</button>
+  </div>
+
+  <div id="alert" class="alert"></div>
+
+  <div style="width:100%;">
+    <div class="form-title" id="formTitle">أهلاً بعودتك</div>
+    <div class="form-sub" id="formSub">سجل دخولك للمتابعة</div>
+
+    <div class="field">
+      <label>اسم المستخدم</label>
+      <input id="username" placeholder="أدخل اسم المستخدم">
+    </div>
+    <div class="field" id="emailField" style="display:none">
+      <label>البريد الإلكتروني</label>
+      <input id="email" type="email" placeholder="example@mail.com">
+    </div>
+    <div class="field" id="passField">
+      <label>كلمة المرور</label>
+      <input id="password" type="password" placeholder="••••••••">
+    </div>
+
+    <button class="submit-btn" onclick="mainAction()" id="submitBtn">
+      دخول
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+
+    <div class="divider"><span>أو</span></div>
+    <div class="forgot-link" id="forgotLink" onclick="setForgot()">نسيت كلمة المرور؟</div>
+  </div>
+</div>
+
+<script>
+let mode = "login";
+
+function setMode(m, btn){
+  mode = m;
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("emailField").style.display = m==="register"?"block":"none";
+  document.getElementById("passField").style.display = "block";
+  document.getElementById("formTitle").textContent = m==="login"?"أهلاً بعودتك":"إنشاء حساب";
+  document.getElementById("formSub").textContent = m==="login"?"سجل دخولك للمتابعة":"أنشئ حسابك الجديد";
+  document.getElementById("submitBtn").querySelector("span")||null;
+  document.getElementById("submitBtn").firstChild.textContent = m==="login"?"دخول":"تسجيل ";
+  document.getElementById("forgotLink").style.display = "block";
+  hideAlert();
+}
+
+function setForgot(){
+  mode = "forgot";
+  document.getElementById("emailField").style.display = "block";
+  document.getElementById("formTitle").textContent = "استعادة كلمة المرور";
+  document.getElementById("formSub").textContent = "أدخل بياناتك لتحديث كلمة المرور";
+  document.getElementById("submitBtn").firstChild.textContent = "تحديث ";
+  document.getElementById("password").placeholder = "كلمة المرور الجديدة";
+  document.getElementById("forgotLink").style.display = "none";
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+}
+
+function showAlert(msg, type="error"){
+  const el = document.getElementById("alert");
+  el.textContent = msg;
+  el.className = "alert "+type;
+  el.style.display = "block";
+  if(type==="error") setTimeout(()=>el.style.display="none",4000);
+}
+function hideAlert(){ document.getElementById("alert").style.display="none"; }
+
+function mainAction(){
+  if(mode==="login") login();
+  else if(mode==="register") register();
+  else if(mode==="forgot") resetPassword();
+}
+
+function register(){
+  const u=document.getElementById("username").value.trim();
+  const e=document.getElementById("email").value.trim();
+  const p=document.getElementById("password").value;
+  if(!u||!e||!p){ showAlert("يرجى ملء جميع الحقول"); return; }
+  const uid="uid_"+Date.now();
+  db.ref("usersperfect/"+uid).set({
+    username:u,email:e,password:p,balance:100,
+    cardNumber:genCard(),cvv:Math.floor(100+Math.random()*900),pin:"0000",gamesOwned:{}
+  }).then(()=>{
+    localStorage.setItem("uid",uid);
+    showAlert("تم إنشاء الحساب بنجاح! جاري التحويل...","success");
+    setTimeout(()=>location.href="profile.html",1200);
+  }).catch(()=>showAlert("حدث خطأ، حاول مجدداً"));
+}
+
+function login(){
+  const u=document.getElementById("username").value.trim();
+  const p=document.getElementById("password").value;
+  if(!u||!p){ showAlert("يرجى ملء جميع الحقول"); return; }
+  db.ref("usersperfect").once("value").then(snap=>{
+    let found=false;
+    snap.forEach(s=>{
+      const d=s.val();
+      if(d.username===u&&d.password===p){
+        found=true;
+        localStorage.setItem("uid",s.key);
+        showAlert("مرحباً "+d.username+"! جاري التحويل...","success");
+        setTimeout(()=>location.href="profile.html",1000);
+      }
+    });
+    if(!found) showAlert("اسم المستخدم أو كلمة المرور غير صحيحة");
+  });
+}
+
+function resetPassword(){
+  const u=document.getElementById("username").value.trim();
+  const e=document.getElementById("email").value.trim();
+  const p=document.getElementById("password").value;
+  if(!u||!e||!p){ showAlert("يرجى ملء جميع الحقول"); return; }
+  db.ref("usersperfect").once("value").then(snap=>{
+    let found=false;
+    snap.forEach(s=>{
+      const d=s.val();
+      if(d.username===u&&d.email===e){
+        found=true;
+        db.ref("usersperfect/"+s.key+"/password").set(p).then(()=>{
+          showAlert("تم تحديث كلمة المرور بنجاح!","success");
+          setTimeout(()=>setMode("login",document.querySelector(".tab-btn")),1500);
+        });
+      }
+    });
+    if(!found) showAlert("لم يتم العثور على الحساب");
+  });
+}
+
+function genCard(){ return "4000-"+r()+"-"+r()+"-"+r(); }
+function r(){ return Math.floor(1000+Math.random()*9000); }
+
+// Enter key
+document.addEventListener("keydown",e=>{ if(e.key==="Enter") mainAction(); });
+</script>
+</body>
+</html>
