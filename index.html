@@ -14,11 +14,20 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --bg:#121212;--surface:#1a1a1a;--surface2:#242424;--surface3:#2a2a2a;
-  --accent:#ac4d00;--accent-h:#181818e5;
-  --text:#ffffff;--text2:#8f8f8f;--text3:#4a4a4a;
-  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.04);
-  --sidebar:252px;
+  --bg:#0d0d0f;
+  --surface:#141416;
+  --surface2:#1a1a1d;
+  --surface3:#222226;
+  --accent:#7c3aed;
+  --accent2:#2563eb;
+  --accent-g:linear-gradient(135deg,#7c3aed,#2563eb);
+  --text:#ffffff;
+  --text2:#9ca3af;
+  --text3:#4b5563;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.04);
+  --gold:#f59e0b;
+  --free:#10b981;
 }
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;min-height:100vh;overflow-x:hidden;}
@@ -27,363 +36,559 @@ a{text-decoration:none;color:inherit;}
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px;}
 
-/* TOPBAR */
-.topbar{
+/* ===== NAVBAR ===== */
+.navbar{
   position:fixed;top:0;left:0;right:0;z-index:1000;
-  height:56px;background:#1a1a1a;
+  height:58px;
+  background:rgba(13,13,15,0.88);
+  backdrop-filter:blur(16px);
   border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 20px;
-  transition:box-shadow .2s;
+  display:flex;align-items:center;padding:0 28px;gap:0;
+  transition:box-shadow .3s;
 }
-.topbar-logo{
-  display:flex;align-items:center;gap:10px;
-  padding-left:20px;margin-left:16px;
-  border-left:1px solid var(--border);height:56px;
+.nav-logo{
+  font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;
+  letter-spacing:2px;color:#fff;margin-left:36px;
+  display:flex;align-items:center;gap:2px;
 }
-.logo-icon{
-  width:32px;height:32px;background:var(--accent);
-  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+.nav-logo .logo-colored{
+  background:var(--accent-g);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
 }
-.logo-text{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:1.5px;}
-.topbar-nav{display:flex;align-items:center;gap:2px;flex:1;margin-right:12px;}
-.topbar-nav a{
-  height:56px;display:flex;align-items:center;gap:7px;
+.nav-links{display:flex;align-items:center;gap:2px;flex:1;}
+.nav-link{
+  height:58px;display:flex;align-items:center;gap:6px;
   padding:0 14px;font-size:13px;font-weight:600;color:var(--text2);
   border-bottom:2px solid transparent;transition:.15s;
 }
-.topbar-nav a:hover{color:var(--text);}
-.topbar-nav a.active{color:var(--text);border-bottom-color:var(--accent);}
-.topbar-right{margin-right:auto;}
-.btn-account{
+.nav-link:hover{color:var(--text);}
+.nav-link.active{color:var(--text);border-bottom-color:var(--accent);}
+.nav-link.rental-link{color:var(--gold);}
+.nav-right{margin-right:auto;display:flex;align-items:center;gap:12px;}
+.nav-bell{
+  width:36px;height:36px;border-radius:50%;position:relative;
+  background:var(--surface2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s;
+}
+.nav-bell:hover{background:var(--surface3);}
+.bell-dot{
+  position:absolute;top:5px;left:5px;width:9px;height:9px;
+  background:var(--accent);border-radius:50%;border:2px solid var(--bg);
+}
+.btn-login{
   background:var(--accent);color:#fff;
-  padding:7px 18px;border-radius:4px;
-  font-size:13px;font-weight:700;font-family:'Cairo',sans-serif;transition:.15s;
-}
-.btn-account:hover{background:var(--accent-h);}
-
-/* LAYOUT */
-.layout{display:flex;margin-top:56px;min-height:calc(100vh - 56px);}
-
-/* SIDEBAR */
-.sidebar{
-  width:var(--sidebar);flex-shrink:0;
-  background:var(--surface);border-left:1px solid var(--border);
-  position:sticky;top:56px;height:calc(100vh - 56px);
-  overflow-y:auto;padding:20px 0;
-}
-.sb-section{padding:0 0 18px;border-bottom:1px solid var(--border2);margin-bottom:18px;}
-.sb-section:last-child{border-bottom:none;margin:0;}
-.sb-label{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--text3);text-transform:uppercase;padding:0 18px;margin-bottom:6px;display:block;}
-.sb-item{
-  display:flex;align-items:center;gap:11px;
-  padding:9px 18px;font-size:13px;font-weight:600;color:var(--text2);
-  cursor:pointer;transition:.15s;border-right:3px solid transparent;
-}
-.sb-item:hover{color:var(--text);background:rgba(255,255,255,0.04);}
-.sb-item.active{color:var(--text);background:rgba(255,255,255,0.06);border-right-color:var(--accent);}
-.sb-item svg{opacity:.7;flex-shrink:0;}
-.sb-item.active svg{opacity:1;}
-
-/* MAIN */
-.main{flex:1;min-width:0;}
-
-/* FEATURED */
-.featured{
-  height:400px;position:relative;overflow:hidden;
-  background:linear-gradient(130deg,#0a0a14 0%,#0b1428 55%,#0a0f1e 100%);
-}
-.feat-bg{
-  position:absolute;inset:0;
-  background:
-    radial-gradient(ellipse 65% 90% at 65% 55%,rgba(0,120,242,0.13) 0%,transparent 65%),
-    radial-gradient(ellipse 35% 55% at 15% 90%,rgba(0,60,160,0.09) 0%,transparent 55%);
-}
-.feat-content{
-  position:relative;z-index:2;
-  display:flex;align-items:flex-end;height:100%;
-  padding:36px 44px;
-}
-.feat-info{max-width:480px;}
-.feat-tag{
-  display:inline-flex;align-items:center;gap:6px;
-  background:var(--accent);padding:3px 10px;border-radius:2px;
-  font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
-  margin-bottom:14px;
-}
-.feat-title{
-  font-family:'Rajdhani',sans-serif;font-size:54px;font-weight:700;
-  line-height:.92;letter-spacing:-1.5px;margin-bottom:12px;
-}
-.feat-desc{font-size:14px;color:var(--text2);line-height:1.65;margin-bottom:24px;max-width:380px;}
-.feat-btns{display:flex;gap:8px;}
-.btn-primary{
-  background:var(--accent);color:#fff;padding:10px 26px;border-radius:4px;
+  padding:8px 20px;border-radius:6px;
   font-size:13px;font-weight:700;font-family:'Cairo',sans-serif;
-  transition:.15s;border:none;cursor:pointer;
+  transition:.15s;display:flex;align-items:center;gap:7px;border:none;cursor:pointer;
 }
-.btn-primary:hover{background:var(--accent-h);}
-.btn-ghost{
-  background:rgba(255,255,255,0.1);color:var(--text);
-  border:1px solid rgba(255,255,255,0.14);
-  padding:10px 22px;border-radius:4px;
-  font-size:13px;font-weight:600;font-family:'Cairo',sans-serif;
-  transition:.15s;cursor:pointer;
+.btn-login:hover{opacity:.85;}
+
+/* ===== HERO ===== */
+.hero{
+  margin-top:58px;min-height:420px;
+  background:linear-gradient(160deg,#09090f 0%,#0d0820 40%,#080d1a 70%,#0a0a0f 100%);
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:60px 24px 80px;
 }
-.btn-ghost:hover{background:rgba(255,255,255,0.17);}
+.hero-glow{
+  position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 55% at 30% 50%,rgba(124,58,237,0.22) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 45% at 70% 50%,rgba(37,99,235,0.18) 0%,transparent 55%);
+}
+.hero-content{position:relative;z-index:2;max-width:680px;}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);
+  padding:4px 14px;border-radius:20px;font-size:11px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;color:rgba(167,139,250,0.9);
+  margin-bottom:22px;
+}
+.hero-title{
+  font-family:'Rajdhani',sans-serif;
+  font-size:clamp(44px,7vw,76px);
+  font-weight:700;line-height:.95;letter-spacing:-2px;margin-bottom:20px;
+}
+.hero-title .w1{color:#fff;}
+.hero-title .w2{background:linear-gradient(135deg,#a78bfa,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hero-title .w3{background:linear-gradient(135deg,#60a5fa,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hero-title .w4{color:#fff;}
+.hero-desc{
+  font-size:15px;color:var(--text2);line-height:1.7;
+  margin-bottom:32px;max-width:520px;margin-left:auto;margin-right:auto;
+}
+.hero-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.btn-hero-primary{
+  background:var(--accent-g);color:#fff;
+  padding:13px 32px;border-radius:8px;
+  font-size:14px;font-weight:700;font-family:'Cairo',sans-serif;
+  transition:.2s;border:none;cursor:pointer;
+  box-shadow:0 8px 32px rgba(124,58,237,0.4);
+}
+.btn-hero-primary:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(124,58,237,0.55);}
+.btn-hero-ghost{
+  background:rgba(255,255,255,0.06);color:var(--text);
+  border:1px solid rgba(255,255,255,0.15);
+  padding:13px 28px;border-radius:8px;
+  font-size:14px;font-weight:600;font-family:'Cairo',sans-serif;
+  transition:.2s;cursor:pointer;
+}
+.btn-hero-ghost:hover{background:rgba(255,255,255,0.1);}
 
-/* STATS */
-.stats-row{display:flex;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
-.stat{flex:1;padding:20px 36px;border-left:1px solid var(--border);text-align:center;}
-.stat:last-child{border-left:none;}
-.stat-num{font-family:'Rajdhani',sans-serif;font-size:30px;font-weight:700;display:block;margin-bottom:2px;}
-.stat-label{font-size:11px;color:var(--text2);font-weight:600;letter-spacing:.3px;}
+/* ===== SECTION ===== */
+.section{padding:36px 48px;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.section-title-wrap{display:flex;align-items:center;gap:10px;}
+.section-icon{
+  width:30px;height:30px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+}
+.section-icon.gold{background:rgba(245,158,11,0.15);}
+.section-icon.purple{background:rgba(124,58,237,0.15);}
+.section-icon.blue{background:rgba(37,99,235,0.15);}
+.section-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;}
+.view-all{
+  font-size:12px;font-weight:700;color:#a78bfa;
+  display:flex;align-items:center;gap:5px;transition:.15s;
+}
+.view-all:hover{color:#fff;}
 
-/* SECTION */
-.section{padding:28px 36px;}
-.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
-.section-title{font-family:'Rajdhani',sans-serif;font-size:21px;font-weight:700;}
-.section-more{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.5px;display:flex;align-items:center;gap:4px;text-transform:uppercase;transition:.15s;}
-.section-more:hover{color:var(--text);}
+/* ===== RENTAL SCROLL ===== */
+.rental-scroll{
+  display:flex;gap:14px;overflow-x:auto;padding-bottom:6px;
+  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+}
+.rental-scroll::-webkit-scrollbar{height:4px;}
+.rental-scroll::-webkit-scrollbar-track{background:transparent;}
+.rental-scroll::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px;}
 
-/* FILTERS */
-.filters{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
-.filter-btn{
+.rental-card{
+  flex:0 0 190px;scroll-snap-align:start;
+  background:var(--surface);border-radius:10px;overflow:hidden;
+  cursor:pointer;transition:.25s;border:1px solid var(--border2);position:relative;
+}
+.rental-card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,0.14);box-shadow:0 20px 48px rgba(0,0,0,0.7);}
+.rental-img-wrap{position:relative;overflow:hidden;}
+.rental-img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;transition:.35s;background:#111;}
+.rental-card:hover .rental-img{transform:scale(1.08);}
+.rental-corner{
+  position:absolute;top:8px;right:8px;
+  background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,0.1);border-radius:4px;
+  padding:2px 8px;font-size:9px;font-weight:700;letter-spacing:.8px;color:#fff;text-transform:uppercase;
+}
+.rental-badge{
+  position:absolute;top:8px;left:8px;
+  width:26px;height:26px;background:var(--accent);border-radius:5px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:900;color:#fff;font-family:'Rajdhani',sans-serif;
+}
+.rental-body{padding:11px 13px;}
+.rental-name{font-size:13px;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rental-meta{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px;}
+
+/* ===== LATEST SLIDER ===== */
+.slider-wrap{position:relative;}
+.slider-track{
+  display:flex;gap:16px;overflow-x:auto;padding-bottom:4px;
+  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+}
+.slider-track::-webkit-scrollbar{display:none;}
+.slider-card{
+  flex:0 0 190px;scroll-snap-align:start;
+  background:var(--surface);border-radius:10px;overflow:hidden;
+  cursor:pointer;transition:.22s;border:1px solid var(--border2);
+}
+.slider-card:hover{transform:translateY(-5px);border-color:rgba(255,255,255,0.12);box-shadow:0 16px 40px rgba(0,0,0,0.65);}
+.slider-img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;transition:.3s;background:#0f0f0f;}
+.slider-card:hover .slider-img{transform:scale(1.06);}
+.slider-body{padding:12px 13px 13px;}
+.slider-name{font-size:13px;font-weight:700;margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.slider-meta{display:flex;align-items:center;justify-content:space-between;}
+.slider-platform{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px;}
+.badge-free{
+  background:rgba(16,185,129,0.15);color:#34d399;
+  border:1px solid rgba(16,185,129,0.25);
+  padding:2px 9px;border-radius:4px;font-size:10px;font-weight:700;
+}
+
+.sl-arrow{
+  position:absolute;top:40%;transform:translateY(-50%);
+  width:34px;height:34px;border-radius:50%;
+  background:rgba(20,20,22,0.9);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;z-index:5;transition:.15s;color:var(--text2);
+}
+.sl-arrow:hover{background:var(--surface3);color:var(--text);}
+.sl-arrow.prev{right:-14px;}
+.sl-arrow.next{left:-14px;}
+
+.dots{display:flex;justify-content:center;gap:6px;margin-top:14px;}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--surface3);cursor:pointer;transition:.2s;}
+.dot.active{width:22px;border-radius:4px;background:var(--accent);}
+
+/* ===== WEEKLY ===== */
+.weekly-card{
+  background:linear-gradient(135deg,var(--surface) 0%,var(--surface2) 100%);
+  border:1px solid var(--border);border-radius:12px;
+  display:flex;align-items:center;gap:24px;padding:22px 26px;
+  cursor:pointer;transition:.2s;
+}
+.weekly-card:hover{border-color:rgba(124,58,237,0.35);box-shadow:0 8px 32px rgba(124,58,237,0.15);}
+.weekly-img{width:88px;height:88px;border-radius:8px;object-fit:cover;flex-shrink:0;background:#111;}
+.weekly-info{flex:1;}
+.weekly-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(16,185,129,0.12);color:#34d399;
+  border:1px solid rgba(16,185,129,0.25);
+  padding:3px 10px;border-radius:4px;font-size:10px;font-weight:700;
+  letter-spacing:.8px;margin-bottom:8px;
+}
+.weekly-name{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px;}
+.weekly-desc{font-size:12px;color:var(--text2);}
+.weekly-action{flex-shrink:0;}
+
+/* ===== ALL GAMES GRID ===== */
+.grid-filters{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.filter-pill{
   background:var(--surface2);border:1px solid var(--border);color:var(--text2);
-  padding:6px 16px;border-radius:4px;font-size:12px;font-weight:700;
-  font-family:'Cairo',sans-serif;cursor:pointer;transition:.15s;letter-spacing:.3px;
-}
-.filter-btn:hover{background:var(--surface3);color:var(--text);}
-.filter-btn.active{background:var(--text);color:#111;border-color:var(--text);}
-
-/* GRID */
-#games{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;}
-.card{
-  background:var(--surface);border-radius:5px;overflow:hidden;
-  cursor:pointer;transition:.2s;border:1px solid var(--border2);
-}
-.card:hover{transform:translateY(-5px);border-color:rgba(255,255,255,0.13);box-shadow:0 18px 44px rgba(0,0,0,0.6);}
-.card-img-wrap{overflow:hidden;position:relative;}
-.card-img{width:100%;height:145px;object-fit:cover;display:block;transition:.3s;background:#111;}
-.card:hover .card-img{transform:scale(1.07);}
-.card-badge{
-  position:absolute;top:7px;right:7px;padding:2px 7px;border-radius:3px;
-  font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
-}
-.card-badge.steam{background:rgba(20,30,45,0.9);color:#66c0f4;}
-.card-badge.torrent{background:rgba(0,0,0,0.75);color:#00e676;}
-.card-body{padding:11px 13px 13px;}
-.card-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;}
-.card-desc{font-size:11px;color:var(--text2);line-height:1.5;height:32px;overflow:hidden;margin-bottom:11px;}
-.add-btn{
-  background:var(--accent);color:#fff;border:none;width:100%;
-  padding:8px;border-radius:3px;font-size:12px;font-weight:700;
+  padding:7px 18px;border-radius:20px;font-size:12px;font-weight:700;
   font-family:'Cairo',sans-serif;cursor:pointer;transition:.15s;
 }
-.add-btn:hover{background:var(--accent-h);}
+.filter-pill:hover{background:var(--surface3);color:var(--text);}
+.filter-pill.active{background:#fff;color:#111;border-color:#fff;}
 
-/* EMPTY */
-.empty{text-align:center;padding:70px 20px;color:var(--text3);grid-column:1/-1;}
-.empty p{font-size:13px;margin-top:10px;}
+#games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.game-card{
+  background:var(--surface);border-radius:10px;overflow:hidden;
+  cursor:pointer;transition:.22s;border:1px solid var(--border2);
+}
+.game-card:hover{transform:translateY(-5px);border-color:rgba(255,255,255,0.13);box-shadow:0 18px 44px rgba(0,0,0,0.6);}
+.gc-img-wrap{overflow:hidden;position:relative;}
+.gc-img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;transition:.3s;background:#111;}
+.game-card:hover .gc-img{transform:scale(1.07);}
+.gc-type{
+  position:absolute;top:7px;right:7px;
+  padding:2px 8px;border-radius:4px;
+  font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+}
+.gc-type.steam{background:rgba(20,30,48,0.88);color:#60a5fa;}
+.gc-type.torrent{background:rgba(0,0,0,0.8);color:#34d399;}
+.gc-body{padding:11px 13px 13px;}
+.gc-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;}
+.gc-desc{font-size:11px;color:var(--text2);line-height:1.5;height:32px;overflow:hidden;margin-bottom:10px;}
+.gc-btn{
+  background:var(--accent);color:#fff;border:none;width:100%;
+  padding:8px;border-radius:6px;font-size:12px;font-weight:700;
+  font-family:'Cairo',sans-serif;cursor:pointer;transition:.15s;
+}
+.gc-btn:hover{opacity:.85;}
 
-/* FOOTER */
-footer{background:var(--surface);border-top:1px solid var(--border);padding:22px 36px;display:flex;align-items:center;justify-content:space-between;}
+.empty-state{text-align:center;padding:70px 20px;color:var(--text3);grid-column:1/-1;}
+.empty-state p{font-size:13px;margin-top:10px;}
+
+/* divider */
+.divider{height:1px;background:var(--border2);margin:0 48px;}
+
+/* ===== FOOTER ===== */
+footer{
+  background:var(--surface);border-top:1px solid var(--border);
+  padding:22px 48px;display:flex;align-items:center;justify-content:space-between;
+}
 .footer-logo{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;color:var(--text2);}
 .footer-copy{font-size:11px;color:var(--text3);}
 
-/* SKELETON */
-.skeleton{background:linear-gradient(90deg,var(--surface) 25%,var(--surface2) 50%,var(--surface) 75%);background-size:200%;animation:shimmer 1.4s infinite;border-radius:5px;}
-@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
-
-@media(max-width:900px){
-  .sidebar{display:none;}
-  .feat-content{padding:24px 20px;}
-  .feat-title{font-size:38px;}
-  .section{padding:22px 18px;}
-  .stats-row{flex-wrap:wrap;}
-  .stat{border-left:none;border-bottom:1px solid var(--border);}
+/* RESPONSIVE */
+@media(max-width:768px){
+  .section{padding:26px 16px;}
+  .divider{margin:0 16px;}
   footer{flex-direction:column;gap:8px;text-align:center;padding:18px;}
+  .hero-title{font-size:40px;}
+  .sl-arrow{display:none;}
+  .weekly-card{flex-direction:column;text-align:center;}
+  .nav-link span{display:none;}
 }
 </style>
 </head>
 <body>
 
-<header class="topbar" id="topbar">
-  <div class="topbar-logo">
-    <div class="logo-icon"></div>
-    <span class="logo-text">Steam Tools</span>
-  </div>
-  <nav class="topbar-nav">
-    <a href="index.html" class="active">
+<!-- NAVBAR -->
+<header class="navbar" id="navbar">
+  <div class="nav-logo"><span class="logo-colored">ST</span></div>
+  <nav class="nav-links">
+    <a href="index.html" class="nav-link active">
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-      الرئيسية
+      <span>الرئيسية</span>
     </a>
-    <a href="library.html">
-      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
-      مكتبتي
+    <a href="library.html" class="nav-link">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="10 15 15 12 10 9 10 15"/></svg>
+      <span>مكتبة</span>
+    </a>
+    <a href="#rental" class="nav-link rental-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
+      <span>إيجار</span>
+    </a>
+    <a href="#weekly" class="nav-link">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>الأسبوعية</span>
     </a>
   </nav>
-  <div class="topbar-right">
-    <a href="auth.html" id="accountLink" class="btn-account">حسابي</a>
+  <div class="nav-right">
+    <div class="nav-bell">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <div class="bell-dot"></div>
+    </div>
+    <a href="auth.html" id="accountLink" class="btn-login">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      تسجيل الدخول
+    </a>
   </div>
 </header>
 
-<div class="layout">
-
-  <aside class="sidebar">
-    <div class="sb-section">
-      <span class="sb-label">التصفح</span>
-      <div class="sb-item active" onclick="filterSidebar('all',this)">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        كل العاب
-      </div>
-      <div class="sb-item" onclick="filterSidebar('steam',this)">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>
-        تطبيقات
-      </div>
-      <div class="sb-item" onclick="filterSidebar('torrent',this)">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-        العاب
-      </div>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      Steam Tools Platform
     </div>
-    <div class="sb-section">
-      <span class="sb-label">الحساب</span>
-      <div class="sb-item" onclick="location.href='profile.html'">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        الملف الشخصي
-      </div>
-      <div class="sb-item" onclick="location.href='library.html'">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        مكتبة العاب
-      </div>
+    <h1 class="hero-title">
+      <span class="w1">العب </span><span class="w2">أي</span> <span class="w3">لعبة</span><br><span class="w4"> مجانا</span>
+    </h1>
+    <p class="hero-desc">احصل على وصول حصري لحسابات Steam محملة مسبقاً لأحدث العناوين AAA. آمن، بسيط، ومجاني تماماً.</p>
+    <div class="hero-btns">
+      <button class="btn-hero-primary" onclick="document.getElementById('rental').scrollIntoView({behavior:'smooth'})">تصفح الإيجار</button>
+      <button class="btn-hero-ghost" onclick="document.getElementById('all-games').scrollIntoView({behavior:'smooth'})">كل الألعاب</button>
     </div>
-  </aside>
+  </div>
+</section>
 
-  <main class="main">
-
-    <div class="featured">
-      <div class="feat-bg"></div>
-      <div class="feat-content">
-        <div class="feat-info">
-          <div class="feat-tag">Steam Tools</div>
-          <div class="feat-title">اكتشف<br>أفضل العاب</div>
-          <div class="feat-desc">تطبيقات والعاب حصرية — أضف مباشرة لمكتبتك وابدأ الاستخدام فوراً.</div>
-          <div class="feat-btns">
-            <button class="btn-primary" onclick="document.getElementById('games-section').scrollIntoView({behavior:'smooth'})">تصفح العاب</button>
-            <button class="btn-ghost" onclick="location.href='library.html'">مكتبتي</button>
-          </div>
-        </div>
-      </div>
+<!-- RENTAL GAMES -->
+<section class="section" id="rental">
+  <div class="section-header">
+    <div class="section-title-wrap">
+      <div class="section-icon gold">💰</div>
+      <h2 class="section-title">ألعاب الإيجار</h2>
     </div>
+    <a href="library.html" class="view-all">عرض الكل <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+  </div>
+  <div class="rental-scroll" id="rental-scroll"></div>
+</section>
 
-    <div class="stats-row">
-      <div class="stat"><span class="stat-num" id="s1">—</span><span class="stat-label">لعبة متاحة</span></div>
-      <div class="stat"><span class="stat-num">مجاني</span><span class="stat-label">الانضمام مجاني</span></div>
-      <div class="stat"><span class="stat-num">24/7</span><span class="stat-label">دعم مستمر</span></div>
+<div class="divider"></div>
+
+<!-- LATEST ADDITIONS -->
+<section class="section" id="latest">
+  <div class="section-header">
+    <div class="section-title-wrap">
+      <div class="section-icon purple">＋</div>
+      <h2 class="section-title">أحدث الإضافات</h2>
     </div>
+    <a href="library.html" class="view-all">عرض الكل <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+  </div>
+  <div class="slider-wrap">
+    <div class="sl-arrow prev" id="sl-prev" onclick="slideLatest(-1)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </div>
+    <div class="slider-track" id="latest-track"></div>
+    <div class="sl-arrow next" id="sl-next" onclick="slideLatest(1)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </div>
+  </div>
+  <div class="dots" id="latest-dots"></div>
+</section>
 
-    <section class="section" id="games-section">
-      <div class="section-header">
-        <h2 class="section-title">المتاح</h2>
-        <a class="section-more">عرض الكل <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
-      </div>
-      <div class="filters">
-        <button class="filter-btn active" onclick="filterGames('all',this)">الكل</button>
-        <button class="filter-btn" onclick="filterGames('steam',this)">تطبيقات</button>
-        <button class="filter-btn" onclick="filterGames('torrent',this)">العاب</button>
-      </div>
-      <div id="games"></div>
-    </section>
+<div class="divider"></div>
 
-    <footer>
-      <div class="footer-logo">Steam Tools</div>
-      <div class="footer-copy">&copy; 2026 Steam Tools — كل الحقوق محفوظة</div>
-    </footer>
+<!-- WEEKLY FREE -->
+<section class="section" id="weekly">
+  <div class="section-header">
+    <div class="section-title-wrap">
+      <div class="section-icon blue">🎁</div>
+      <h2 class="section-title">اللعبة المجانية الأسبوعية</h2>
+    </div>
+    <a href="library.html" class="view-all">عرض الكل <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+  </div>
+  <div id="weekly-wrap"></div>
+</section>
 
-  </main>
-</div>
+<div class="divider"></div>
+
+<!-- ALL GAMES -->
+<section class="section" id="all-games">
+  <div class="section-header">
+    <div class="section-title-wrap">
+      <div class="section-icon purple">🎮</div>
+      <h2 class="section-title">كل الألعاب</h2>
+    </div>
+    <span id="games-count" style="font-size:12px;color:var(--text3);font-weight:700;"></span>
+  </div>
+  <div class="grid-filters">
+    <button class="filter-pill active" onclick="filterGrid('all',this)">الكل</button>
+    <button class="filter-pill" onclick="filterGrid('steam',this)">تطبيقات</button>
+    <button class="filter-pill" onclick="filterGrid('torrent',this)">ألعاب</button>
+  </div>
+  <div id="games-grid"></div>
+</section>
+
+<footer>
+  <div class="footer-logo">S7G Steam Tools</div>
+  <div class="footer-copy">&copy; 2026 Steam Tools — كل الحقوق محفوظة</div>
+</footer>
 
 <script>
+/* Auth */
 const uid = localStorage.getItem("uid");
 const accountLink = document.getElementById("accountLink");
 if(uid){ accountLink.href="profile.html"; accountLink.textContent="حسابي"; }
 
-const gamesContainer = document.getElementById("games");
-let allGames = [];
-let currentCategory = "all";
-
-db.ref("games").once("value").then(snap=>{
-  snap.forEach(gSnap=>{ allGames.push({id:gSnap.key,...gSnap.val()}); });
-  document.getElementById("s1").textContent = allGames.length;
-  displayGames("all");
+/* Navbar shadow */
+window.addEventListener("scroll",()=>{
+  document.getElementById("navbar").style.boxShadow =
+    scrollY>8?"0 2px 24px rgba(0,0,0,0.7)":"none";
 });
 
-function displayGames(category){
-  currentCategory = category;
-  gamesContainer.innerHTML="";
-  const filtered = category==="all" ? allGames : allGames.filter(g=>g.category===category);
+/* Load all games from Firebase */
+let allGames = [];
+let latestPage = 0;
 
-  if(filtered.length===0){
-    gamesContainer.innerHTML=`<div class="empty">
-      <svg width="36" height="36" fill="none" stroke="#3a3a3a" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
-      <p>لا توجد العاب في هذا القسم</p>
-    </div>`;
+db.ref("games").once("value").then(snap=>{
+  snap.forEach(g=>{ allGames.push({id:g.key,...g.val()}); });
+  renderRental();
+  renderLatest();
+  renderWeekly();
+  renderGrid("all");
+  const cnt = document.getElementById("games-count");
+  if(cnt) cnt.textContent = allGames.length + " لعبة";
+});
+
+/* ---- RENTAL ---- */
+function renderRental(){
+  const wrap = document.getElementById("rental-scroll");
+  if(!wrap) return;
+  const games = allGames.filter(g=>g.category==="steam").slice(0,12);
+  if(!games.length){ wrap.innerHTML=`<div style="padding:30px;color:var(--text3);font-size:13px;">لا توجد ألعاب إيجار</div>`; return; }
+  wrap.innerHTML = games.map(g=>`
+    <div class="rental-card" onclick="goGame('${g.id}')">
+      <div class="rental-img-wrap">
+        <img class="rental-img" src="${g.coverImage||''}" alt="${g.name}" loading="lazy" onerror="this.style.background='#111'">
+        <div class="rental-corner">S7G</div>
+        <div class="rental-badge">R</div>
+      </div>
+      <div class="rental-body">
+        <div class="rental-name">${g.name}</div>
+        <div class="rental-meta">
+          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+          Steam
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+/* ---- LATEST ---- */
+function renderLatest(){
+  const track = document.getElementById("latest-track");
+  const dotsWrap = document.getElementById("latest-dots");
+  if(!track) return;
+  const games = [...allGames].slice(-10).reverse();
+  if(!games.length){ track.innerHTML=`<div style="padding:30px;color:var(--text3);font-size:13px;">لا توجد إضافات حديثة</div>`; return; }
+  track.innerHTML = games.map(g=>`
+    <div class="slider-card" onclick="goGame('${g.id}')">
+      <img class="slider-img" src="${g.coverImage||''}" alt="${g.name}" loading="lazy" onerror="this.style.background='#0f0f0f'">
+      <div class="slider-body">
+        <div class="slider-name">${g.name}</div>
+        <div class="slider-meta">
+          <div class="slider-platform">
+            <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+            Steam
+          </div>
+          <span class="badge-free">مجاني</span>
+        </div>
+      </div>
+    </div>
+  `).join("");
+  const pages = Math.ceil(games.length/5);
+  if(dotsWrap) dotsWrap.innerHTML = Array.from({length:pages},(_,i)=>`<div class="dot ${i===0?'active':''}" onclick="setLatestPage(${i})"></div>`).join("");
+}
+
+function slideLatest(dir){
+  const track = document.getElementById("latest-track");
+  const cardW = 215+16;
+  const visible = Math.max(1,Math.floor(track.clientWidth/cardW));
+  const pages = Math.ceil(track.children.length/visible);
+  latestPage = Math.max(0,Math.min(pages-1,latestPage+dir));
+  track.scrollTo({left:latestPage*visible*cardW*(document.dir==="rtl"?-1:1),behavior:"smooth"});
+  updateDots();
+}
+function setLatestPage(p){ latestPage=p; slideLatest(0); }
+function updateDots(){
+  document.querySelectorAll(".dot").forEach((d,i)=>d.classList.toggle("active",i===latestPage));
+}
+
+/* ---- WEEKLY ---- */
+function renderWeekly(){
+  const wrap = document.getElementById("weekly-wrap");
+  if(!wrap||!allGames.length) return;
+  const game = allGames.find(g=>g.weekly) || allGames[0];
+  if(!game) return;
+  wrap.innerHTML=`
+    <div class="weekly-card" onclick="goGame('${game.id}')">
+      <img class="weekly-img" src="${game.coverImage||''}" alt="${game.name}" onerror="this.style.background='#111'">
+      <div class="weekly-info">
+        <div class="weekly-badge">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          مجاني هذا الأسبوع
+        </div>
+        <div class="weekly-name">${game.name}</div>
+        <div class="weekly-desc">${(game.description||"لعبة مجانية الأسبوع").substring(0,80)}...</div>
+      </div>
+      <div class="weekly-action">
+        <button class="gc-btn" style="width:120px;padding:10px 16px;font-size:13px;" onclick="event.stopPropagation();goGame('${game.id}')">احصل عليها</button>
+      </div>
+    </div>
+  `;
+}
+
+/* ---- ALL GAMES ---- */
+function renderGrid(cat){
+  const grid = document.getElementById("games-grid");
+  if(!grid) return;
+  const games = cat==="all" ? allGames : allGames.filter(g=>g.category===cat);
+  if(!games.length){
+    grid.innerHTML=`<div class="empty-state"><svg width="36" height="36" fill="none" stroke="#2a2a2a" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg><p>لا توجد ألعاب في هذا القسم</p></div>`;
     return;
   }
-
-  filtered.forEach(game=>{
-    const card=document.createElement("div");
-    card.className="card";
-    const bc = game.category==="steam"?"steam":"torrent";
-    const bt = game.category==="steam"?"برنامج":"لعبة";
-    card.innerHTML=`
-      <div class="card-img-wrap">
-        <img class="card-img" src="${game.coverImage||''}" alt="${game.name}" loading="lazy">
-        <span class="card-badge ${bc}">${bt}</span>
-      </div>
-      <div class="card-body">
-        <div class="card-name">${game.name}</div>
-        <div class="card-desc">${game.description?game.description.substring(0,70)+"...":""}</div>
-        <button class="add-btn" onclick="goGame('${game.id}')">إضافة للمكتبة</button>
+  grid.innerHTML = games.map(g=>{
+    const bc = g.category==="steam"?"steam":"torrent";
+    const bt = g.category==="steam"?"برنامج":"لعبة";
+    return `
+      <div class="game-card" onclick="goGame('${g.id}')">
+        <div class="gc-img-wrap">
+          <img class="gc-img" src="${g.coverImage||''}" alt="${g.name}" loading="lazy" onerror="this.style.background='#111'">
+          <span class="gc-type ${bc}">${bt}</span>
+        </div>
+        <div class="gc-body">
+          <div class="gc-name">${g.name}</div>
+          <div class="gc-desc">${(g.description||"").substring(0,65)}${g.description&&g.description.length>65?"...":""}</div>
+          <button class="gc-btn" onclick="event.stopPropagation();goGame('${g.id}')">إضافة للمكتبة</button>
+        </div>
       </div>
     `;
-    gamesContainer.appendChild(card);
-  });
+  }).join("");
 }
 
-function filterGames(category, btn){
-  document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
+function filterGrid(cat,btn){
+  document.querySelectorAll(".filter-pill").forEach(b=>b.classList.remove("active"));
   btn.classList.add("active");
-  syncSidebar(category);
-  displayGames(category);
-}
-
-function filterSidebar(category, el){
-  document.querySelectorAll(".sb-item").forEach(i=>i.classList.remove("active"));
-  el.classList.add("active");
-  document.querySelectorAll(".filter-btn").forEach((b,i)=>{
-    if(i===0&&category==="all"||i===1&&category==="steam"||i===2&&category==="torrent")
-      b.classList.add("active");
-    else b.classList.remove("active");
-  });
-  displayGames(category);
-}
-
-function syncSidebar(category){
-  document.querySelectorAll(".sb-item").forEach((item,i)=>{
-    const match=(i===0&&category==="all")||(i===1&&category==="steam")||(i===2&&category==="torrent");
-    if(match) item.classList.add("active"); else item.classList.remove("active");
-  });
+  renderGrid(cat);
 }
 
 function goGame(id){
   localStorage.setItem("buyGame",id);
   window.location.href="game.html?id="+id;
 }
-
-window.addEventListener("scroll",()=>{
-  document.getElementById("topbar").style.boxShadow =
-    scrollY>8?"0 2px 24px rgba(0,0,0,0.6)":"none";
-});
 </script>
 </body>
 </html>
