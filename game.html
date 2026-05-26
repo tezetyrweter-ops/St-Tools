@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Steam Tools - تفاصيل ملف</title>
+<title>Steam Tools - تفاصيل اللعبة</title>
 <link rel="icon" type="image/png" href="storecon.png">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -14,525 +14,651 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --bg:#121212;--surface:#1a1a1a;--surface2:#242424;--surface3:#2a2a2a;
-  --accent:#ac4d00;--accent-h:#181818e5;
-  --text:#ffffff;--text2:#8f8f8f;--text3:#4a4a4a;
-  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.04);
-  --success:#00e676;--error:#ff4757;--gold:#f5c518;
+  --bg:#0d0d0f;
+  --surface:#141416;
+  --surface2:#1a1a1d;
+  --surface3:#222226;
+  --accent:#7c3aed;
+  --accent2:#2563eb;
+  --accent-g:linear-gradient(135deg,#7c3aed,#2563eb);
+  --text:#ffffff;
+  --text2:#9ca3af;
+  --text3:#4b5563;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.04);
+  --gold:#f59e0b;
+  --free:#10b981;
 }
-body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;min-height:100vh;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;min-height:100vh;overflow-x:hidden;}
 a{text-decoration:none;color:inherit;}
-
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:1000;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 48px;height:56px;
-  background:rgba(14,15,17,0.95);backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border);
-}
-.nav-logo{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;letter-spacing:2px;display:flex;align-items:center;gap:10px;}
-.nav-logo::before{content:'';width:28px;height:28px;background:var(--accent);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:block;}
-.nav-links{display:flex;align-items:center;gap:8px;}
-.nav-links a{padding:8px 16px;border-radius:6px;font-size:14px;font-weight:600;color:var(--text2);transition:.2s;}
-.nav-links a:hover{color:var(--text);background:rgba(255,255,255,0.06);}
-.nav-cta{background:var(--accent);color:#fff!important;padding:9px 22px;border-radius:6px;font-size:14px;font-weight:700;}
-.nav-cta:hover{background:#0088ff!important;}
-
-/* HERO */
-.game-hero{
-  margin-top:56px;
-  min-height:560px;
-  position:relative;overflow:hidden;
-  display:flex;
-  align-items:flex-end;
-}
-.hero-backdrop{
-  position:absolute;inset:0;
-  background:#060810;
-  z-index:0;
-}
-.hero-img-blur{ display:none; }
-.hero-img-main{
-  position:absolute;inset:0;
-  width:100%;height:100%;
-  object-fit:cover;
-  object-position:center top;
-  display:block;
-  z-index:1;
-}
-.hero-img-wrap{
-  position:absolute;inset:0;
-  overflow:hidden;
-}
-.hero-img-wrap::before{
-  content:'';
-  position:absolute;inset:0;
-  background:
-    linear-gradient(to top, var(--bg) 0%, rgba(14,15,17,0.8) 35%, rgba(14,15,17,0.1) 100%),
-    linear-gradient(to right, rgba(14,15,17,0.95) 0%, rgba(14,15,17,0.5) 50%, transparent 80%);
-  z-index:2;
-  pointer-events:none;
-}
-.hero-overlay{display:none;}
-.hero-content{
-  position:relative;z-index:3;
-  padding:56px 48px;
-  width:100%;
-  max-width:660px;
-  padding-bottom:52px;
-}
-
-.breadcrumb{
-  display:flex;align-items:center;gap:8px;
-  font-size:13px;color:var(--text3);margin-bottom:20px;
-}
-.breadcrumb a{color:var(--text2);transition:.2s;}
-.breadcrumb a:hover{color:var(--accent2);}
-.breadcrumb span{color:var(--text3);}
-
-.game-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:5px 12px;border-radius:4px;margin-bottom:16px;
-  font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
-}
-.game-badge.steam{background:rgba(102,192,244,0.1);color:#66c0f4;border:1px solid rgba(102,192,244,0.25);}
-.game-badge.torrent{background:rgba(0,230,118,0.1);color:var(--green);border:1px solid rgba(0,230,118,0.25);}
-
-h1{
-  font-family:'Rajdhani',sans-serif;
-  font-size:52px;font-weight:700;letter-spacing:-1px;line-height:1;margin-bottom:16px;
-}
-
-.game-desc{font-size:16px;color:var(--text2);line-height:1.8;margin-bottom:28px;max-width:480px;}
-
-.meta-row{display:flex;gap:24px;margin-bottom:32px;}
-.meta-item label{display:block;font-size:11px;color:var(--text3);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
-.meta-item span{font-size:15px;font-weight:600;color:var(--text);}
-
-.price-block{display:flex;align-items:center;gap:20px;}
-.price-tag{
-  font-family:'Rajdhani',sans-serif;
-  font-size:48px;font-weight:700;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-
-.buy-now{
-  background:var(--accent);color:#fff;border:none;
-  padding:16px 40px;border-radius:8px;
-  font-size:16px;font-weight:700;font-family:'Cairo',sans-serif;
-  cursor:pointer;transition:.25s;letter-spacing:.5px;
-  display:inline-flex;align-items:center;gap:10px;
-}
-.buy-now:hover{background:#0088ff;transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,116,228,0.4);}
-.buy-now:disabled{background:#333;color:#666;cursor:not-allowed;transform:none;}
-
-/* GALLERY */
-.gallery-section{padding:40px 48px;border-top:1px solid var(--border);}
-.gallery-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:.5px;margin-bottom:16px;color:var(--text2);}
-.gallery{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;}
-.gallery::-webkit-scrollbar{height:4px;}
-.gallery::-webkit-scrollbar-track{background:var(--surface);}
-.gallery::-webkit-scrollbar-thumb{background:var(--accent);border-radius:2px;}
-.gallery img{
-  width:160px;height:90px;object-fit:cover;border-radius:6px;
-  cursor:pointer;flex-shrink:0;
-  border:2px solid transparent;transition:.2s;
-  filter:brightness(.7);
-}
-.gallery img:hover,.gallery img.active{border-color:var(--accent);filter:brightness(1);}
-
-/* INFO PANEL */
-.info-section{
-  display:grid;grid-template-columns:1fr 320px;gap:0;
-  border-top:1px solid var(--border);
-}
-.info-main{padding:40px 48px;}
-.info-main h2{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
-.info-main h2::before{content:'';width:3px;height:20px;background:linear-gradient(var(--accent),var(--accent2));border-radius:2px;}
-.info-main p{color:var(--text2);line-height:1.9;font-size:15px;}
-
-.info-sidebar{
-  background:var(--surface);border-right:1px solid var(--border);
-  padding:32px 28px;
-}
-.sidebar-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:14px 0;border-bottom:1px solid var(--border);
-}
-.sidebar-row:last-child{border-bottom:none;}
-.sidebar-label{font-size:13px;color:var(--text3);font-weight:600;}
-.sidebar-val{font-size:14px;font-weight:700;color:var(--text);}
-
-/* LIGHTBOX */
-.lightbox{
-  position:fixed;inset:0;z-index:9999;
-  display:flex;align-items:center;justify-content:center;
-  background:rgba(0,0,0,0);
-  backdrop-filter:blur(0px);
-  pointer-events:none;
-  transition:background .3s,backdrop-filter .3s;
-}
-.lightbox.open{
-  background:rgba(0,0,0,0.88);
-  backdrop-filter:blur(12px);
-  pointer-events:all;
-}
-.lightbox-inner{
-  position:relative;
-  max-width:90vw;max-height:85vh;
-  transform:scale(0.88);opacity:0;
-  transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s;
-}
-.lightbox.open .lightbox-inner{
-  transform:scale(1);opacity:1;
-}
-.lightbox-inner img{
-  display:block;
-  max-width:90vw;max-height:82vh;
-  width:auto;height:auto;
-  border-radius:10px;
-  box-shadow:0 32px 80px rgba(0,0,0,0.7);
-  border:1px solid rgba(255,255,255,0.1);
-}
-.lightbox-close{
-  position:absolute;top:-16px;right:-16px;
-  width:36px;height:36px;border-radius:50%;
-  background:var(--surface2);border:1px solid var(--border);
-  color:var(--text2);font-size:20px;line-height:1;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:.2s;
-}
-.lightbox-close:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
-.lightbox-nav{
-  position:absolute;top:50%;transform:translateY(-50%);
-  width:44px;height:44px;border-radius:50%;
-  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);
-  color:#fff;font-size:20px;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:.2s;backdrop-filter:blur(8px);
-}
-.lightbox-nav:hover{background:var(--accent);border-color:var(--accent);}
-.lightbox-prev{left:-60px;}
-.lightbox-next{right:-60px;}
-.lightbox-counter{
-  position:absolute;bottom:-36px;left:50%;transform:translateX(-50%);
-  font-size:13px;color:rgba(255,255,255,0.5);letter-spacing:1px;
-}
-
-/* FOOTER */
-footer{background:var(--surface);border-top:1px solid var(--border);padding:28px 48px;display:flex;align-items:center;justify-content:space-between;margin-top:60px;}
-.footer-logo{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px;color:var(--text2);}
-.footer-copy{font-size:13px;color:var(--text3);}
-
-@media(max-width:768px){
-  nav{padding:0 20px;}
-  .game-hero{min-height:420px;align-items:flex-end;}
-  .hero-img-wrap::before{
-    background:
-      linear-gradient(to top, var(--bg) 0%, rgba(14,15,17,0.85) 50%, rgba(14,15,17,0.2) 100%);
-  }
-  .hero-content{width:100%;padding:28px 20px 40px;max-width:100%;}
-  h1{font-size:32px;}
-  .gallery-section{padding:24px 20px;}
-  .info-section{grid-template-columns:1fr;}
-  .info-sidebar{border-right:none;border-top:1px solid var(--border);}
-  .info-main{padding:28px 20px;}
-  footer{flex-direction:column;gap:12px;text-align:center;padding:20px;}
-}
-
-/* ── TOPBAR Epic ── */
-.topbar{
-  position:fixed;top:0;left:0;right:0;z-index:1000;
-  height:56px;background:#1a1a1a;
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 20px;
-  transition:box-shadow .2s;
-}
-.topbar-logo{
-  display:flex;align-items:center;gap:10px;
-  padding-left:20px;margin-left:16px;
-  border-left:1px solid var(--border);height:56px;
-}
-.logo-icon{
-  width:32px;height:32px;background:var(--accent);
-  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
-  flex-shrink:0;
-}
-.logo-text{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:1.5px;}
-.topbar-nav{display:flex;align-items:center;gap:2px;flex:1;margin-right:8px;}
-.topbar-nav a{
-  height:56px;display:flex;align-items:center;gap:7px;
-  padding:0 14px;font-size:13px;font-weight:600;color:var(--text2);
-  border-bottom:2px solid transparent;transition:.15s;text-decoration:none;color:var(--text2);
-}
-.topbar-nav a:hover{color:var(--text);}
-.topbar-nav a.active{color:var(--text);border-bottom-color:var(--accent);}
-.topbar-right{margin-right:auto;}
-.btn-account{
-  background:var(--accent);color:#fff !important;
-  padding:7px 18px;border-radius:4px;
-  font-size:13px;font-weight:700;font-family:'Cairo',sans-serif;
-  transition:.15s;text-decoration:none;
-}
-.btn-account:hover{background:var(--accent-h) !important;}
 ::-webkit-scrollbar{width:5px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px;}
+
+/* ===== NAVBAR (same as index) ===== */
+.navbar{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  height:58px;
+  background:rgba(13,13,15,0.88);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 28px;
+  transition:box-shadow .3s;
+}
+.nav-logo{
+  font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;
+  letter-spacing:2px;color:#fff;margin-left:36px;
+}
+.nav-logo .logo-colored{
+  background:var(--accent-g);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1;}
+.nav-link{
+  height:58px;display:flex;align-items:center;gap:6px;
+  padding:0 14px;font-size:13px;font-weight:600;color:var(--text2);
+  border-bottom:2px solid transparent;transition:.15s;
+}
+.nav-link:hover{color:var(--text);}
+.nav-link.active{color:var(--text);border-bottom-color:var(--accent);}
+.nav-link.rental-link{color:var(--gold);}
+.nav-right{margin-right:auto;display:flex;align-items:center;gap:12px;}
+.nav-bell{
+  width:36px;height:36px;border-radius:50%;position:relative;
+  background:var(--surface2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s;
+}
+.nav-bell:hover{background:var(--surface3);}
+.bell-dot{
+  position:absolute;top:5px;left:5px;width:9px;height:9px;
+  background:var(--accent);border-radius:50%;border:2px solid var(--bg);
+}
+.btn-login{
+  background:var(--accent);color:#fff;
+  padding:8px 20px;border-radius:6px;
+  font-size:13px;font-weight:700;font-family:'Cairo',sans-serif;
+  transition:.15s;display:flex;align-items:center;gap:7px;border:none;cursor:pointer;
+}
+.btn-login:hover{opacity:.85;}
+
+/* ===== HERO BACKDROP ===== */
+.game-hero{
+  margin-top:58px;height:480px;
+  position:relative;overflow:hidden;
+}
+.hero-blur-bg{
+  position:absolute;inset:0;z-index:0;
+  background:#060810;
+}
+.hero-blur-img{
+  position:absolute;inset:-20px;z-index:1;
+  width:calc(100% + 40px);height:calc(100% + 40px);
+  object-fit:cover;object-position:center top;
+  filter:blur(28px) brightness(0.35) saturate(1.3);
+  transform:scale(1.05);
+}
+.hero-gradient{
+  position:absolute;inset:0;z-index:2;
+  background:
+    linear-gradient(to top, var(--bg) 0%, rgba(13,13,15,0.6) 50%, rgba(13,13,15,0.1) 100%),
+    linear-gradient(to right, rgba(13,13,15,0.9) 0%, rgba(13,13,15,0.3) 55%, transparent 85%);
+}
+
+/* ===== MAIN CONTENT LAYOUT ===== */
+.page-wrap{
+  position:relative;z-index:3;
+  max-width:1200px;margin:0 auto;padding:0 48px;
+}
+
+/* Back button inside hero */
+.back-btn{
+  position:absolute;top:58px;right:0;left:0;
+  padding:24px 48px;z-index:10;
+}
+.back-link{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:13px;font-weight:600;color:var(--text2);
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  padding:8px 16px;border-radius:6px;
+  backdrop-filter:blur(8px);transition:.15s;
+}
+.back-link:hover{color:var(--text);background:rgba(255,255,255,0.1);}
+
+/* Two-column layout */
+.game-layout{
+  display:flex;gap:40px;
+  padding:0 48px 0;
+  margin-top:-220px;position:relative;z-index:4;
+}
+
+/* Cover image */
+.cover-col{flex-shrink:0;width:220px;}
+.cover-img{
+  width:220px;
+  aspect-ratio:3/4;
+  object-fit:cover;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.1);
+  box-shadow:0 24px 64px rgba(0,0,0,0.8);
+  display:block;background:#111;
+}
+
+/* Info column */
+.info-col{flex:1;padding-top:120px;}
+
+.game-tags{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.tag{
+  padding:4px 12px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+}
+.tag-steam{background:rgba(96,165,250,0.12);color:#60a5fa;border:1px solid rgba(96,165,250,0.25);}
+.tag-torrent{background:rgba(52,211,153,0.12);color:#34d399;border:1px solid rgba(52,211,153,0.25);}
+.tag-free{background:rgba(52,211,153,0.12);color:#34d399;border:1px solid rgba(52,211,153,0.25);}
+.tag-offline{background:rgba(124,58,237,0.15);color:#a78bfa;border:1px solid rgba(124,58,237,0.25);}
+.tag-date{background:rgba(255,255,255,0.05);color:var(--text2);border:1px solid var(--border);}
+
+.game-title{
+  font-family:'Rajdhani',sans-serif;
+  font-size:44px;font-weight:700;letter-spacing:-1px;line-height:1;
+  margin-bottom:18px;
+}
+
+.game-desc-short{
+  font-size:14px;color:var(--text2);line-height:1.8;
+  margin-bottom:24px;max-width:560px;
+}
+
+.meta-chips{display:flex;gap:16px;margin-bottom:28px;flex-wrap:wrap;}
+.meta-chip{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:6px;padding:10px 16px;
+}
+.meta-chip-label{font-size:10px;color:var(--text3);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;}
+.meta-chip-val{font-size:14px;font-weight:700;color:var(--text);}
+
+.action-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.btn-add{
+  background:var(--accent-g);color:#fff;border:none;
+  padding:14px 36px;border-radius:8px;
+  font-size:14px;font-weight:700;font-family:'Cairo',sans-serif;
+  cursor:pointer;transition:.2s;display:flex;align-items:center;gap:10px;
+  box-shadow:0 8px 28px rgba(124,58,237,0.35);
+}
+.btn-add:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(124,58,237,0.5);}
+.btn-add:disabled{background:var(--surface3);color:var(--text3);cursor:not-allowed;transform:none;box-shadow:none;}
+.btn-wish{
+  width:46px;height:46px;border-radius:8px;
+  background:var(--surface2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:.15s;color:var(--text2);
+}
+.btn-wish:hover{border-color:rgba(124,58,237,0.4);color:var(--accent);}
+
+/* ===== GALLERY ===== */
+.gallery-wrap{padding:36px 48px 0;}
+.gallery-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;}
+.gallery-scroll::-webkit-scrollbar{height:4px;}
+.gallery-scroll::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px;}
+.gallery-thumb{
+  width:150px;height:84px;object-fit:cover;border-radius:6px;
+  flex-shrink:0;cursor:pointer;transition:.2s;
+  border:2px solid transparent;filter:brightness(.65);
+}
+.gallery-thumb:hover,.gallery-thumb.active{border-color:var(--accent);filter:brightness(1);}
+
+/* ===== DETAILS SECTION ===== */
+.details-wrap{
+  display:grid;grid-template-columns:1fr 300px;gap:0;
+  margin:36px 48px 0;
+  border:1px solid var(--border);border-radius:12px;overflow:hidden;
+}
+.details-main{padding:32px 36px;border-left:1px solid var(--border);}
+.details-main h2{
+  font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;
+  margin-bottom:16px;display:flex;align-items:center;gap:10px;color:var(--text);
+}
+.details-main h2::before{
+  content:'';width:3px;height:18px;
+  background:var(--accent-g);border-radius:2px;display:block;
+}
+.details-main p{color:var(--text2);line-height:1.9;font-size:14px;}
+
+.details-sidebar{padding:28px 24px;background:var(--surface);}
+.details-sidebar h3{
+  font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;
+  margin-bottom:16px;color:var(--text2);letter-spacing:.5px;
+}
+.info-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 0;border-bottom:1px solid var(--border2);
+}
+.info-row:last-child{border-bottom:none;}
+.info-lbl{font-size:12px;color:var(--text3);font-weight:600;}
+.info-val{font-size:13px;font-weight:700;color:var(--text);}
+.info-val.green{color:#34d399;}
+.info-val.purple{color:#a78bfa;}
+
+/* ===== TRUSTPILOT BADGE ===== */
+.trust-wrap{
+  margin:28px 48px;
+  display:flex;align-items:center;gap:14px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:18px 24px;width:fit-content;
+}
+.trust-stars{display:flex;gap:3px;}
+.star{
+  width:28px;height:28px;background:#00b67a;border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+}
+.trust-text{font-size:13px;color:var(--text2);}
+.trust-name{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#00b67a;}
+
+/* ===== ACCOUNTS SECTION ===== */
+.accounts-section{margin:0 48px 48px;}
+.accounts-header{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;
+  margin-bottom:16px;
+}
+.accounts-header svg{color:var(--accent);}
+.locked-box{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:48px;text-align:center;
+}
+.lock-icon{
+  width:56px;height:56px;border-radius:12px;
+  background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 16px;
+}
+.locked-title{font-size:16px;font-weight:700;margin-bottom:6px;}
+.locked-sub{font-size:13px;color:var(--text2);}
+
+/* ===== FOOTER ===== */
+footer{
+  background:var(--surface);border-top:1px solid var(--border);
+  padding:22px 48px;display:flex;align-items:center;justify-content:space-between;
+}
+.footer-logo{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;color:var(--text2);}
+.footer-copy{font-size:11px;color:var(--text3);}
+
+/* ===== LIGHTBOX ===== */
+.lightbox{
+  position:fixed;inset:0;z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0);backdrop-filter:blur(0px);
+  pointer-events:none;transition:background .3s,backdrop-filter .3s;
+}
+.lightbox.open{background:rgba(0,0,0,0.9);backdrop-filter:blur(14px);pointer-events:all;}
+.lightbox-inner{
+  position:relative;max-width:90vw;max-height:85vh;
+  transform:scale(0.9);opacity:0;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .25s;
+}
+.lightbox.open .lightbox-inner{transform:scale(1);opacity:1;}
+.lightbox-inner img{display:block;max-width:90vw;max-height:82vh;border-radius:10px;border:1px solid rgba(255,255,255,0.08);}
+.lb-close{
+  position:absolute;top:-14px;right:-14px;
+  width:32px;height:32px;border-radius:50%;
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--text2);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:18px;transition:.15s;
+}
+.lb-close:hover{background:var(--accent);color:#fff;}
+.lb-nav{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:.15s;
+}
+.lb-nav:hover{background:var(--accent);}
+.lb-prev{right:-54px;}
+.lb-next{left:-54px;}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .game-layout{flex-direction:column;padding:24px 20px 0;margin-top:-60px;gap:20px;}
+  .cover-col{width:140px;}
+  .cover-img{width:140px;}
+  .info-col{padding-top:0;}
+  .game-title{font-size:30px;}
+  .details-wrap{grid-template-columns:1fr;margin:24px 20px 0;}
+  .details-sidebar{border-left:none;border-top:1px solid var(--border);}
+  .gallery-wrap{padding:24px 20px 0;}
+  .accounts-section{margin:0 20px 36px;}
+  .trust-wrap{margin:20px;}
+  footer{flex-direction:column;gap:8px;text-align:center;padding:18px;}
+  .nav-link span{display:none;}
+  .back-btn{padding:16px 20px;}
+}
 </style>
 </head>
 <body>
 
-<header class="topbar" id="topbar">
-  <div class="topbar-logo">
-    <div class="logo-icon"></div>
-    <span class="logo-text">Steam Tools</span>
-  </div>
-  <nav class="topbar-nav">
-    <a href="index.html" class="active">
+<!-- NAVBAR -->
+<header class="navbar" id="navbar">
+  <div class="nav-logo"><span class="logo-colored">ST</span></div>
+  <nav class="nav-links">
+    <a href="index.html" class="nav-link active">
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-      المتجر
+      <span>الرئيسية</span>
     </a>
-    <a href="library.html">
-      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
-      مكتبتي
+    <a href="library.html" class="nav-link">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="10 15 15 12 10 9 10 15"/></svg>
+      <span>مكتبة</span>
+    </a>
+    <a href="#" class="nav-link rental-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
+      <span>إيجار</span>
+    </a>
+    <a href="#" class="nav-link">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>الأسبوعية</span>
+    </a>
+    <a href="#" class="nav-link">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>القواعد</span>
+    </a>
+    <a href="#" class="nav-link">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+      <span>الدليل</span>
     </a>
   </nav>
-  <div class="topbar-right">
-    <a href="auth.html" id="accountLink" class="btn-account">حسابي</a>
+  <div class="nav-right">
+    <div class="nav-bell">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <div class="bell-dot"></div>
+    </div>
+    <a href="auth.html" id="accountLink" class="btn-login">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      تسجيل الدخول
+    </a>
   </div>
 </header>
 
-<!-- HERO -->
-<div class="game-hero">
-  <div class="hero-backdrop"></div>
-  <div class="hero-img-wrap">
-    <img class="hero-img-main" id="mainImg" src="" alt="">
-  </div>
-  <div class="hero-content">
-    <div class="breadcrumb">
-      <a href="index.html">المتجر</a>
-      <span>›</span>
-      <span id="breadName">...</span>
-    </div>
-    <div class="game-badge" id="gameBadge"></div>
-    <h1 id="gameName">جاري التحميل...</h1>
-    <p class="game-desc" id="gameDesc"></p>
-    <div class="meta-row">
+<!-- BACK BUTTON -->
+<div class="back-btn">
+  <a href="index.html" class="back-link">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    الرجوع للمتجر
+  </a>
+</div>
 
-      <div class="meta-item">
-        <label>الحجم</label>
-        <span id="metaSize">—</span>
-      </div>
-    </div>
-    <div class="price-block">
-      <button class="buy-now" id="buyBtn">
-        إضافة إلى المكتبة
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+<!-- HERO BACKDROP -->
+<div class="game-hero">
+  <div class="hero-blur-bg"></div>
+  <img class="hero-blur-img" id="heroBg" src="" alt="">
+  <div class="hero-gradient"></div>
+</div>
+
+<!-- GAME LAYOUT -->
+<div class="game-layout">
+  <div class="cover-col">
+    <img class="cover-img" id="coverImg" src="" alt="" onclick="openLightbox(0)" style="cursor:zoom-in">
+  </div>
+  <div class="info-col">
+    <div class="game-tags" id="gameTags"></div>
+    <h1 class="game-title" id="gameName">جاري التحميل...</h1>
+    <p class="game-desc-short" id="gameDescShort"></p>
+    <div class="meta-chips" id="metaChips"></div>
+    <div class="action-row">
+      <button class="btn-add" id="buyBtn">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        إضافة للمكتبة
       </button>
+      <div class="btn-wish" title="المفضلة">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- GALLERY -->
-<div class="gallery-section">
-  <div class="gallery-title">معرض الصور</div>
-  <div class="gallery" id="gallery"></div>
+<div class="gallery-wrap">
+  <div class="gallery-scroll" id="galleryScroll"></div>
 </div>
 
-<!-- INFO PANEL -->
-<div class="info-section">
-  <div class="info-main">
-    <h2>عن ملف</h2>
+<!-- TRUSTPILOT -->
+<div class="trust-wrap">
+  <div>
+    <div class="trust-name">Trustpilot</div>
+    <div class="trust-stars">
+      <div class="star"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+      <div class="star"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+      <div class="star"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+      <div class="star"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+      <div class="star"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+    </div>
+  </div>
+  <div class="trust-text">موثوق بنا من آلاف المستخدمين</div>
+</div>
+
+<!-- DETAILS -->
+<div class="details-wrap">
+  <div class="details-main">
+    <h2>عن اللعبة</h2>
     <p id="fullDesc">جاري التحميل...</p>
   </div>
-  <div class="info-sidebar">
-    <div class="sidebar-row">
-      <span class="sidebar-label">النوع</span>
-      <span class="sidebar-val" id="siCategory">—</span>
+  <div class="details-sidebar">
+    <h3>معلومات</h3>
+    <div class="info-row">
+      <span class="info-lbl">النوع</span>
+      <span class="info-val purple" id="siCategory">—</span>
     </div>
-    <div class="sidebar-row">
-      <span class="sidebar-label">الحجم</span>
-      <span class="sidebar-val" id="siSize">—</span>
+    <div class="info-row">
+      <span class="info-lbl">الحجم</span>
+      <span class="info-val" id="siSize">—</span>
     </div>
+    <div class="info-row">
+      <span class="info-lbl">الوصول</span>
+      <span class="info-val green">مجاني</span>
+    </div>
+    <div class="info-row">
+      <span class="info-lbl">المنصة</span>
+      <span class="info-val">Steam Offline</span>
+    </div>
+  </div>
+</div>
 
+<!-- ACCOUNTS SECTION -->
+<div class="accounts-section" id="accountsSection">
+  <div class="accounts-header">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.78 7.78 5.5 5.5 0 017.78-7.78z"/></svg>
+    حسابات Steam
+  </div>
+  <div class="locked-box" id="lockedBox">
+    <div class="lock-icon">
+      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:#a78bfa"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    </div>
+    <div class="locked-title">تسجيل الدخول مطلوب</div>
+    <div class="locked-sub" style="margin-bottom:20px;">سجّل دخولك للوصول إلى حسابات Steam</div>
+    <a href="auth.html" style="background:var(--accent-g);color:#fff;padding:10px 28px;border-radius:7px;font-size:13px;font-weight:700;display:inline-block;">تسجيل الدخول</a>
   </div>
 </div>
 
 <footer>
-  <div class="footer-logo">Steam Tools</div>
-  <div class="footer-copy">&copy; 2026 Steam Tools</div>
+  <div class="footer-logo">S7G Steam Tools</div>
+  <div class="footer-copy">&copy; 2026 Steam Tools — كل الحقوق محفوظة</div>
 </footer>
 
+<!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox">
   <div class="lightbox-inner">
-    <img id="lightboxImg" src="" alt="">
-    <button class="lightbox-close" id="lightboxClose">&times;</button>
-    <button class="lightbox-nav lightbox-prev" id="lightboxPrev">&#8249;</button>
-    <button class="lightbox-nav lightbox-next" id="lightboxNext">&#8250;</button>
-    <div class="lightbox-counter" id="lightboxCounter"></div>
+    <img id="lbImg" src="" alt="">
+    <div class="lb-close" id="lbClose">&times;</div>
+    <div class="lb-nav lb-prev" id="lbPrev">&#8250;</div>
+    <div class="lb-nav lb-next" id="lbNext">&#8249;</div>
   </div>
 </div>
 
 <script>
+/* ---- Auth ---- */
 const uid = localStorage.getItem("uid");
 const accountLink = document.getElementById("accountLink");
-if(uid){ accountLink.href="profile.html"; }
+if(uid){
+  accountLink.href = "profile.html";
+  accountLink.innerHTML = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> حسابي`;
+}
 
+/* ---- Navbar shadow ---- */
+window.addEventListener("scroll",()=>{
+  document.getElementById("navbar").style.boxShadow =
+    scrollY>8?"0 2px 24px rgba(0,0,0,0.7)":"none";
+});
+
+/* ---- Load game ---- */
 const id = new URLSearchParams(location.search).get("id");
+let galleryImgs = [];
 
 db.ref("games/"+id).once("value").then(snap=>{
   const g = snap.val();
-  if(!g){ alert("ملف غير موجودة"); location="index.html"; return; }
+  if(!g){ location="index.html"; return; }
 
-  document.title = g.name + " - Steam Tools";
-  document.getElementById("gameName").textContent = g.name;
-  document.getElementById("breadName").textContent = g.name;
-  document.getElementById("gameDesc").textContent = g.description ? g.description.substring(0,120)+"..." : "";
-  document.getElementById("fullDesc").textContent = g.description || "";
-
-  document.getElementById("metaSize").textContent = g.size || "—";
-
-  const badge = document.getElementById("gameBadge");
-  badge.textContent = g.category==="steam" ? "تطبيقات" : "لعبة";
-  badge.className = "game-badge " + (g.category==="steam"?"steam":"torrent");
-
-  document.getElementById("siCategory").textContent = g.category==="steam"?"تطبيقات":"لعبة";
-  document.getElementById("siSize").textContent = g.size || "—";
-
+  document.title = g.name + " — Steam Tools";
 
   const img = g.coverImage || g.image || "";
-  document.getElementById("mainImg").src = img;
+
+  // Hero bg
+  document.getElementById("heroBg").src = img;
+  // Cover
+  document.getElementById("coverImg").src = img;
+  document.getElementById("coverImg").alt = g.name;
+
+  // Title & desc
+  document.getElementById("gameName").textContent = g.name;
+  document.getElementById("gameDescShort").textContent = g.description
+    ? g.description.substring(0,150)+(g.description.length>150?"...":"")
+    : "";
+  document.getElementById("fullDesc").textContent = g.description || "لا يوجد وصف متاح.";
+
+  // Tags
+  const tagsEl = document.getElementById("gameTags");
+  const catTag = g.category==="steam"
+    ? `<span class="tag tag-steam">تطبيق Steam</span>`
+    : `<span class="tag tag-torrent">لعبة</span>`;
+  tagsEl.innerHTML = catTag +
+    `<span class="tag tag-free">وصول مجاني</span>` +
+    `<span class="tag tag-offline">Steam Offline</span>` +
+    (g.addedAt ? `<span class="tag tag-date">أُضيف ${new Date(g.addedAt).toLocaleDateString('ar-EG')}</span>` : "");
+
+  // Meta chips
+  const chips = document.getElementById("metaChips");
+  if(g.size) chips.innerHTML += `<div class="meta-chip"><div class="meta-chip-label">الحجم</div><div class="meta-chip-val">${g.size}</div></div>`;
+  chips.innerHTML += `<div class="meta-chip"><div class="meta-chip-label">المنصة</div><div class="meta-chip-val">Windows</div></div>`;
+  chips.innerHTML += `<div class="meta-chip"><div class="meta-chip-label">النوع</div><div class="meta-chip-val">${g.category==="steam"?"تطبيق":"لعبة"}</div></div>`;
+
+  // Sidebar
+  document.getElementById("siCategory").textContent = g.category==="steam"?"تطبيق":"لعبة";
+  document.getElementById("siSize").textContent = g.size || "—";
 
   // Gallery
-  const gallery = document.getElementById("gallery");
-  const allImgs = [img];
-  if(g.images) Object.values(g.images).forEach(s=>{ if(s && s!==img) allImgs.push(s); });
+  galleryImgs = [img];
+  if(g.images) Object.values(g.images).forEach(s=>{ if(s && s!==img) galleryImgs.push(s); });
 
-  allImgs.forEach((src,i)=>{
+  const scroll = document.getElementById("galleryScroll");
+  galleryImgs.forEach((src,i)=>{
     const el = document.createElement("img");
     el.src = src;
-    if(i===0) el.classList.add("active");
+    el.className = "gallery-thumb" + (i===0?" active":"");
     el.onclick = ()=>{
-      document.getElementById("mainImg").src = src;
-      gallery.querySelectorAll("img").forEach(x=>x.classList.remove("active"));
+      document.querySelectorAll(".gallery-thumb").forEach(x=>x.classList.remove("active"));
       el.classList.add("active");
+      document.getElementById("coverImg").src = src;
       openLightbox(i);
     };
-    gallery.appendChild(el);
+    scroll.appendChild(el);
   });
-  window._galleryImgs = allImgs;
+
+  // Accounts section
+  if(uid){
+    document.getElementById("lockedBox").innerHTML = `
+      <div style="padding:20px;color:var(--text2);font-size:14px;">جاري تحميل الحسابات...</div>
+    `;
+    db.ref("usersperfect/"+uid+"/gamesOwned/"+id).once("value").then(own=>{
+      if(own.exists()){
+        db.ref("games/"+id+"/accounts").once("value").then(acSnap=>{
+          if(!acSnap.exists()){ document.getElementById("lockedBox").innerHTML=`<div style="padding:20px;color:var(--text2);">لا توجد حسابات متاحة حالياً.</div>`; return; }
+          let html = `<div style="display:flex;flex-direction:column;gap:10px;">`;
+          acSnap.forEach(ac=>{
+            const a = ac.val();
+            html += `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-size:13px;font-weight:700;margin-bottom:4px;">${a.username||"حساب"}</div>
+                <div style="font-size:12px;color:var(--text3);">${a.password||""}</div>
+              </div>
+              <button onclick="navigator.clipboard.writeText('${a.username||""}'+'\\n'+'${a.password||""}')" style="background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;">نسخ</button>
+            </div>`;
+          });
+          html += `</div>`;
+          document.getElementById("lockedBox").innerHTML = html;
+        });
+      }
+    });
+  }
 });
 
+/* ---- Buy button ---- */
 document.getElementById("buyBtn").addEventListener("click",()=>{
-  if(!uid){ alert("يجب تسجيل الدخول أولاً"); location="auth.html"; return; }
-
+  if(!uid){ location="auth.html"; return; }
   const btn = document.getElementById("buyBtn");
   btn.disabled = true;
-  btn.textContent = "جاري الإضافة...";
+  btn.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="animation:spin 1s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> جاري...`;
 
   db.ref("usersperfect/"+uid).once("value").then(uSnap=>{
     const user = uSnap.val();
-
-    // already owned
-    if(user.gamesOwned && user.gamesOwned[id]){
-      alert("هذا الملف موجود مسبقاً في مكتبتك ✅");
-      location = "library.html";
-      return;
-    }
+    if(user?.gamesOwned?.[id]){ alert("موجود مسبقاً في مكتبتك ✅"); location="library.html"; return; }
 
     db.ref("games/"+id).once("value").then(gSnap=>{
       const game = gSnap.val();
-
       if(user.balance < game.price){
-        alert("رصيد غير كافي 💳\nرصيدك: "+user.balance+"$ | سعر الملف: "+game.price+"$");
-        btn.disabled = false;
-        btn.innerHTML = 'إضافة إلى المكتبة <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+        alert("رصيد غير كافٍ 💳"); btn.disabled=false;
+        btn.innerHTML=`<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> إضافة للمكتبة`;
         return;
       }
-
-      // deduct balance
-      db.ref("usersperfect/"+uid).update({ balance: user.balance - game.price });
-
-      // add to library
-      db.ref("usersperfect/"+uid+"/gamesOwned/"+id).set({
-        purchasedAt: Date.now()
-      });
-
-      // log order
-      db.ref("orders").push({
-        user: uid,
-        game: id,
-        price: game.price,
-        date: Date.now()
-      });
-
-      alert("تمت الإضافة إلى مكتبتك ✅");
-      location = "library.html";
+      db.ref("usersperfect/"+uid).update({balance: user.balance - game.price});
+      db.ref("usersperfect/"+uid+"/gamesOwned/"+id).set({purchasedAt:Date.now()});
+      db.ref("orders").push({user:uid,game:id,price:game.price,date:Date.now()});
+      alert("تمت الإضافة ✅"); location="library.html";
     });
-  }).catch(err=>{
-    alert("حدث خطأ، حاول مرة أخرى");
-    btn.disabled = false;
-    btn.innerHTML = 'إضافة إلى المكتبة <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+  }).catch(()=>{
+    alert("حدث خطأ"); btn.disabled=false;
+    btn.innerHTML=`<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> إضافة للمكتبة`;
   });
 });
 
-// LIGHTBOX
-let _lbIndex = 0;
-let _lb, _lbImg, _lbCounter;
-
-function openLightbox(index){
-  const imgs = window._galleryImgs || [];
-  if(!imgs.length) return;
-  _lbIndex = index;
-  _lbImg.src = imgs[_lbIndex];
-  _lbCounter.textContent = (_lbIndex+1) + " / " + imgs.length;
-  _lb.classList.add("open");
-  document.body.style.overflow = "hidden";
+/* ---- Lightbox ---- */
+let _lbIdx = 0;
+function openLightbox(i){
+  if(!galleryImgs.length) return;
+  _lbIdx = i;
+  document.getElementById("lbImg").src = galleryImgs[_lbIdx];
+  document.getElementById("lightbox").classList.add("open");
+  document.body.style.overflow="hidden";
 }
-
 function closeLightbox(){
-  _lb.classList.remove("open");
-  document.body.style.overflow = "";
+  document.getElementById("lightbox").classList.remove("open");
+  document.body.style.overflow="";
 }
-
-function lbNav(dir){
-  const imgs = window._galleryImgs || [];
-  _lbIndex = (_lbIndex + dir + imgs.length) % imgs.length;
-  _lbImg.style.opacity = "0";
-  setTimeout(()=>{
-    _lbImg.src = imgs[_lbIndex];
-    _lbCounter.textContent = (_lbIndex+1) + " / " + imgs.length;
-    _lbImg.style.opacity = "1";
-  }, 150);
+function lbNav(d){
+  _lbIdx = (_lbIdx+d+galleryImgs.length)%galleryImgs.length;
+  const img = document.getElementById("lbImg");
+  img.style.opacity="0";
+  setTimeout(()=>{ img.src=galleryImgs[_lbIdx]; img.style.opacity="1"; },120);
 }
-
-window.addEventListener("DOMContentLoaded", ()=>{
-  _lb = document.getElementById("lightbox");
-  _lbImg = document.getElementById("lightboxImg");
-  _lbCounter = document.getElementById("lightboxCounter");
-  _lbImg.style.transition = "opacity .15s";
-
-  document.getElementById("lightboxClose").onclick = closeLightbox;
-  document.getElementById("lightboxPrev").onclick = ()=> lbNav(-1);
-  document.getElementById("lightboxNext").onclick = ()=> lbNav(1);
-  _lb.addEventListener("click", e=>{ if(e.target === _lb) closeLightbox(); });
-
-  document.addEventListener("keydown", e=>{
-    if(!_lb.classList.contains("open")) return;
-    if(e.key === "Escape") closeLightbox();
-    if(e.key === "ArrowLeft") lbNav(1);
-    if(e.key === "ArrowRight") lbNav(-1);
-  });
-
-  const mainImg = document.getElementById("mainImg");
-  mainImg.style.cursor = "zoom-in";
-  mainImg.addEventListener("click",()=>{
-    const imgs = window._galleryImgs || [];
-    const idx = imgs.findIndex(s => mainImg.src.endsWith(s) || s === mainImg.src);
-    openLightbox(idx >= 0 ? idx : 0);
-  });
+document.getElementById("lbClose").onclick = closeLightbox;
+document.getElementById("lbPrev").onclick = ()=>lbNav(-1);
+document.getElementById("lbNext").onclick = ()=>lbNav(1);
+document.getElementById("lightbox").addEventListener("click",e=>{ if(e.target===document.getElementById("lightbox")) closeLightbox(); });
+document.addEventListener("keydown",e=>{
+  if(!document.getElementById("lightbox").classList.contains("open")) return;
+  if(e.key==="Escape") closeLightbox();
+  if(e.key==="ArrowLeft") lbNav(1);
+  if(e.key==="ArrowRight") lbNav(-1);
 });
+document.getElementById("lbImg").style.transition="opacity .12s";
 </script>
+
+<style>@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}</style>
 </body>
 </html>
