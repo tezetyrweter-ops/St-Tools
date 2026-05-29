@@ -563,16 +563,21 @@ function renderGrid(cat){
   grid.innerHTML = games.map(g=>{
     const bc = g.category==="steam"?"steam":"torrent";
     const bt = g.category==="steam"?"برنامج":"لعبة";
+    const soonBadge = g.comingSoon ? `<span style="position:absolute;bottom:8px;left:8px;background:linear-gradient(135deg,#f59e0b,#f97316);color:#000;font-size:9px;font-weight:900;padding:3px 9px;border-radius:4px;letter-spacing:.5px;box-shadow:0 2px 8px rgba(245,158,11,0.5);">🔜 SOON</span>` : '';
+    const btnHtml = g.comingSoon
+      ? `<button class="gc-btn" disabled style="opacity:.45;cursor:not-allowed;background:var(--surface3);color:var(--text3);">🔜 قريباً</button>`
+      : `<button class="gc-btn" onclick="event.stopPropagation();goGame('${g.id}')">إضافة للمكتبة</button>`;
     return `
-      <div class="game-card" onclick="goGame('${g.id}')">
-        <div class="gc-img-wrap">
+      <div class="game-card" onclick="${g.comingSoon ? '' : `goGame('${g.id}')`}" style="${g.comingSoon ? 'cursor:default;' : ''}">
+        <div class="gc-img-wrap" style="position:relative;">
           <img class="gc-img" src="${g.coverImage||''}" alt="${g.name}" loading="lazy" onerror="this.style.background='#111'">
           <span class="gc-type ${bc}">${bt}</span>
+          ${soonBadge}
         </div>
         <div class="gc-body">
-          <div class="gc-name">${g.name}</div>
+          <div class="gc-name">${g.name}${g.comingSoon ? ' <span style="font-size:10px;color:#f59e0b;font-weight:700;">• Soon</span>' : ''}</div>
           <div class="gc-desc">${(g.description||"").substring(0,65)}${g.description&&g.description.length>65?"...":""}</div>
-          <button class="gc-btn" onclick="event.stopPropagation();goGame('${g.id}')">إضافة للمكتبة</button>
+          ${btnHtml}
         </div>
       </div>
     `;
