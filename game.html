@@ -537,10 +537,19 @@ db.ref("games/"+id).once("value").then(snap=>{
   const catTag = g.category==="steam"
     ? `<span class="tag tag-steam">تطبيق Steam</span>`
     : `<span class="tag tag-torrent">لعبة</span>`;
-  tagsEl.innerHTML = catTag +
+  const soonTag = g.comingSoon ? `<span class="tag" style="background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);">🔜 قريباً</span>` : '';
+  tagsEl.innerHTML = catTag + soonTag +
     `<span class="tag tag-free">وصول مجاني</span>` +
     `<span class="tag tag-offline">Steam Offline</span>` +
     (g.addedAt ? `<span class="tag tag-date">أُضيف ${new Date(g.addedAt).toLocaleDateString('ar-EG')}</span>` : "");
+
+  // Coming Soon — disable buy button
+  if(g.comingSoon){
+    const buyBtn = document.getElementById("buyBtn");
+    buyBtn.disabled = true;
+    buyBtn.innerHTML = `🔜 قريباً — غير متاح بعد`;
+    buyBtn.style.cssText += ";opacity:.5;cursor:not-allowed;background:var(--surface3);color:var(--text3);box-shadow:none;";
+  }
 
   // Meta chips
   const chips = document.getElementById("metaChips");
@@ -605,12 +614,22 @@ document.getElementById("buyBtn").addEventListener("click",()=>{
   btn.disabled = true;
   btn.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="animation:spin 1s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> جاري...`;
 
-  db.ref("usersperfect/"+uid).once("value").then(uSnap=>{
+  db.ref("games/"+id).once("value").then(gSnap=>{
+    const game = gSnap.val();
+
+    // 🔒 منع الشراء إذا كان المنتج "قريباً"
+    if(game.comingSoon){
+      alert("هذا المنتج غير متاح بعد، سيتم إطلاقه قريباً 🔜");
+      btn.disabled=true;
+      btn.innerHTML=`🔜 قريباً — غير متاح بعد`;
+      btn.style.cssText+=";opacity:.5;cursor:not-allowed;background:var(--surface3);color:var(--text3);box-shadow:none;";
+      return;
+    }
+
+    db.ref("usersperfect/"+uid).once("value").then(uSnap=>{
     const user = uSnap.val();
     if(user?.gamesOwned?.[id]){ alert("موجود مسبقاً في مكتبتك ✅"); location="library.html"; return; }
 
-    db.ref("games/"+id).once("value").then(gSnap=>{
-      const game = gSnap.val();
       if(user.balance < game.price){
         alert("رصيد غير كافٍ 💳"); btn.disabled=false;
         btn.innerHTML=`<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> إضافة للمكتبة`;
